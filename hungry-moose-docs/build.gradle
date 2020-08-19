@@ -4,6 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'com.github.spotbugs' version '4.5.0'
     id 'org.springframework.boot' version '2.2.4.RELEASE'
 }
 
@@ -39,6 +40,37 @@ test {
         exceptionFormat TestExceptionFormat.FULL
     }
 }
+
+//More spotbugs properties can be found here -> https://spotbugs-gradle-plugin.netlify.app/com/github/spotbugs/snom/spotbugsextension
+tasks.matching { it.name.startsWith("spotbugs") }.each {
+    it.reports {
+        text.enabled = true
+    }
+}
+
+task('spotbugsReportMain') {
+    doLast {
+        if (spotbugsMain.state.failure != null) {
+            println()
+            file("build/reports/spotbugs/main.txt").readLines().forEach {
+                println(it)
+            }
+        }
+    }
+}
+
+task('spotbugsReportTest') {
+    doLast {
+        if(spotbugsTest.state.failure != null) {
+            println()
+            file("build/reports/spotbugs/test.txt").readLines().forEach {
+                println( it )
+            }
+        }
+    }
+}
+tasks.getByPath("spotbugsMain").finalizedBy(spotbugsReportMain)
+tasks.getByPath("spotbugsTest").finalizedBy(spotbugsReportTest)
 
 dependencies {
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
