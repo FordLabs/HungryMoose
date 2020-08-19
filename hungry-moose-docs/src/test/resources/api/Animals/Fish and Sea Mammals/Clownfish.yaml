@@ -1,0 +1,12 @@
+name: A joke about the forest
+detail: Here comes a leg-slappingly-funny pun!
+request: |
+  GET /what/do/you/call/a/bear/with/no/teeth HTTP/1.1
+response: |
+  HTTP/1.1 200 OK
+  
+  A gummy bear.
+---
+name: These don't even strictly have to be HTTP?
+request: Do you Yahoo?
+response: Why yes I do Yahoo!

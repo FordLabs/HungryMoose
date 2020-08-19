@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en-US">
+    <body>
+        <div th:fragment="specNode (spec)">
+            <span th:if="${spec.isDirectory()}" th:text="${spec.getDirectoryName()}"></span>
+            <ul th:if="${spec.isDirectory()}">
+                <li th:each="specChild : ${spec.getChildren()}">
+                    <div th:replace="docSpecTree :: specNode(spec=${specChild})"></div>
+                </li>
+            </ul>
+            <span th:if="${not spec.isDirectory()}" ><a th:href="${specApiRoot + spec.getUrlEncodedFilePath(specDocumentRoot)}" th:text="${spec.getSpecName()}"></a></span>
+        </div>
+
+    </body>
+</html>

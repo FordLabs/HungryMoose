@@ -1,0 +1,94 @@
+%TEMPLATE_MODE HTML
+# ------------ separator comment -----------
+%CONTEXT
+rootNode = new com.fordlabs.hungrymoose.Spec('src/test/resources/api')
+specDocumentRoot = "api/"
+specApiRoot = "/docs/"
+# ------------------------------------------
+%MESSAGES
+one.msg = Crisis
+# ------------------------------------------
+%INPUT (file:src/main/resources/templates/rootDocTemplate.html)
+%INPUT[docSpecTree] (file:src/main/resources/templates/fragments/docSpecTree.html)
+# ------------------------------------------
+%OUTPUT
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Docs</title>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/testing/style/rootStyle.css">
+</head>
+<body>
+    <div>
+          <span>api</span>
+          <ul>
+              <li>
+                <div>
+                    <span>Animals</span>
+                    <ul>
+                      <li>
+                        <div>
+                            <span>Fish and Sea Mammals</span>
+                            <ul>
+                              <li>
+                                <div>
+                                  <span><a href="/docs/Animals/Fish%20and%20Sea%20Mammals/Bottle-Nosed%20Dolphin.yaml">Bottle-Nosed Dolphin</a></span>
+                                </div>
+                              </li>
+                              <li>
+                                <div>
+                                  <span><a href="/docs/Animals/Fish%20and%20Sea%20Mammals/Clownfish.yaml">Clownfish</a></span>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                      </li>
+                      <li>
+                         <div>
+                           <span><a href="/docs/Animals/Grizzly%20Bear.yaml">Grizzly Bear</a></span>
+                         </div>
+                       </li>
+                       <li>
+                         <div>
+                           <span><a href="/docs/Animals/Platypus.yaml">Platypus</a></span>
+                         </div>
+                       </li>
+                    </ul>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <span>Bacteria</span>
+                  <ul>
+                    <li>
+                      <div>
+                        <span><a href="/docs/Bacteria/Salmonella.txt">Salmonella</a></span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <span><a href="/docs/Mushroom.yaml">Mushroom</a></span>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <span>Plants</span>
+                  <ul>
+                    <li>
+                      <div>
+                        <span><a href="/docs/Plants/Pacific%20Redwood.yaml">Pacific Redwood</a></span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+          </ul>
+    </div>
+</body>
+</html>

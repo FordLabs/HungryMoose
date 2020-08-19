@@ -1,0 +1,21 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.4.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'java'
+}
+
+group = 'com.fordlabs'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'fordlabs:hungry-moose-docs:1.0-SNAPSHOT'
+	implementation 'org.springframework.boot:spring-boot-starter'
+
+	testImplementation 'fordlabs:hungry-moose-test:1.0-SNAPSHOT'
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+}

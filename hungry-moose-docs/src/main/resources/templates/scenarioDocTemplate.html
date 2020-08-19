@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <title th:text="${spec.getSpecName()}"></title>
+        <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+        <link rel="stylesheet" th:href="@{/style/codeStyle.css}">
+        <link rel="stylesheet" th:href="@{/style/scenarioStyle.css}">
+        <script>hljs.initHighlightingOnLoad();</script>
+    </head>
+    <body>
+        <nav>
+            <h1 th:text="${spec.getSpecName()}"></h1>
+            <div class="back-link">
+                <a th:href="${rootUrl}"><<< Back to list</a>
+            </div>
+            <ul>
+                <li th:each="scenario : ${scenarios}"><a th:href="${'#' + scenario.getScenarioId()}" th:text="${scenario.getName()}"></a></li>
+            </ul>
+        </nav>
+        <main>
+            <div th:each="scenario : ${scenarios}" th:remove="tag">
+                <div th:replace="scenarioFragment :: node(scenario=${scenario})"></div>
+            </div>
+        </main>
+    </body>
+</html>

@@ -1,0 +1,158 @@
+name: GET Valid JSON
+request: |
+  GET /rapid-stub/valid-json HTTP/1.1
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {"data":"bar"}
+
+---
+
+name: POST Valid JSON
+request: |
+  POST /rapid-stub/valid-json HTTP/1.1
+  Content-Type: application/json
+
+  {"data": "foo" }
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {"data":"bar"}
+
+---
+
+name: Headers will be preserved
+request: |
+  POST /rapid-stub/knock-knock-headers json HTTP/1.1
+  Content-Type: application/json
+  EstherWho: EstherBunny
+  AnaWho: AnAnotherEasterBunny
+
+  {"data": "foo" }
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {"headers":[
+       {"name":"content-type","value":"application/json"},
+       {"name":"estherwho","value":"EstherBunny"},
+       {"name":"anawho","value":"AnAnotherEasterBunny"}
+       ]}
+
+---
+
+name: Headers will be preserved on GET
+request: |
+  GET /rapid-stub/knock-knock-headers json HTTP/1.1
+  EstherWho: EstherBunny
+  AnaWho: AnAnotherEasterBunny
+  StillWho: StillAnotherEasterBunny
+
+
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {"headers":[
+       {"name":"estherwho","value":"EstherBunny"},
+       {"name":"anawho","value":"AnAnotherEasterBunny"},
+       {"name":"stillwho","value":"StillAnotherEasterBunny"}
+       ]}
+
+---
+
+name: Can send arbitrary HTTP headers
+request: |
+  GET /echo HTTP/1.1
+  Something: somewhere
+  Everything: everywhere
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "method": "GET",
+    "headers": {
+      "something": ["somewhere"],
+      "everything": ["everywhere"]
+    },
+    "body": "...",
+    "uri": "..."
+  }
+---
+
+name: Uses the correct URI
+request: |
+  GET /echo/foo/bar/baz HTTP/1.1
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "uri": "/echo/foo/bar/baz",
+    "method": "...",
+    "headers": "...",
+    "body": "..."
+  }
+
+---
+name: Can submit a PUT request
+request: |
+  PUT /echo/12345 HTTP/1.1
+  Content-Type: application/xml
+
+  <data>here ya go</data>
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "uri": "/echo/12345",
+    "method": "PUT",
+    "headers": "...",
+    "body": "<data>here ya go</data>"
+  }
+
+---
+
+name: Can submit a DELETE request
+request: |
+  DELETE /echo/abc/xyz HTTP/1.1
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "uri": "/echo/abc/xyz",
+    "method": "DELETE",
+    "headers": "...",
+    "body": ""
+  }
+
+---
+
+name: Can expect response that doesn't declare the actual response body
+request: |
+  GET /echo/foo/bar/baz HTTP/1.1
+
+response: |
+  HTTP/1.1 200 OK
+
+---
+
+name: Property Set Id will return 409 Not Found
+request: |
+  GET /rapid-stub/im-conflicted HTTP/1.1
+
+response: |
+  HTTP/1.1 409 Conflict

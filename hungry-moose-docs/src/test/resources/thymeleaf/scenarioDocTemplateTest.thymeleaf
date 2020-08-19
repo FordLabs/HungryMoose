@@ -1,0 +1,66 @@
+%TEMPLATE_MODE HTML
+# ------------ separator comment -----------
+%CONTEXT
+spec = new com.fordlabs.hungrymoose.Spec('src/test/resources/api/Animals/Fish and Sea Mammals/Clownfish.yaml')
+scenarios = new com.fordlabs.hungrymoose.Spec('src/test/resources/api/Animals/Fish and Sea Mammals/Clownfish.yaml').getScenarios()
+rootUrl = '/dorks/'
+# ------------------------------------------
+%INPUT (file:src/main/resources/templates/scenarioDocTemplate.html)
+%INPUT[scenarioFragment] (file:src/main/resources/templates/fragments/scenarioFragment.html)
+# ------------------------------------------
+%OUTPUT
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <title>Clownfish</title>
+        <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js"></script>
+        <link rel="stylesheet" href="/testing/style/codeStyle.css">
+        <link rel="stylesheet" href="/testing/style/scenarioStyle.css">
+        <script>hljs.initHighlightingOnLoad();</script>
+    </head>
+    <body>
+        <nav>
+        <h1>Clownfish</h1>
+        <div class="back-link">
+            <a href="/dorks/"><<< Back to list</a>
+        </div>
+            <ul>
+                <li><a href="#a-joke-about-the-forest">A joke about the forest</a></li>
+                <li><a href="#these-dont-even-strictly-have-to-be-http">These don&#39;t even strictly have to be HTTP?</a></li>
+            </ul>
+        </nav>
+        <main>
+            <div class="scenario" id="a-joke-about-the-forest">
+                <h2>A joke about the forest</h2>
+                <p>Here comes a leg-slappingly-funny pun!</p>
+                <h3>Request</h3>
+                <pre>
+                    <code>GET /what/do/you/call/a/bear/with/no/teeth HTTP/1.1
+                    </code>
+                </pre>
+                <h3>Response</h3>
+                <pre>
+                    <code>HTTP/1.1 200 OK
+
+                        A gummy bear.
+                    </code>
+                </pre>
+            </div>
+            <div class="scenario" id="these-dont-even-strictly-have-to-be-http">
+                <h2>These don&#39;t even strictly have to be HTTP?</h2>
+                <h3>Request</h3>
+                <pre>
+                    <code>Do you Yahoo?</code>
+                </pre>
+                <h3>Response</h3>
+                <pre>
+                    <code>Why yes I do Yahoo!</code>
+                </pre>
+            </div>
+        </main>
+    </body>
+</html>

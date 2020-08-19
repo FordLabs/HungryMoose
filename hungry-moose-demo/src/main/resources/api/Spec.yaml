@@ -1,0 +1,99 @@
+name: GET Valid JSON
+detail: A bit of information around the particular case being tested here and what it is meant for and what it implies and some text to increase its length so you get a feel for how this block looks but you don’t have lorem ipsum because I wanted to see it with real text okay?
+request: |
+  GET /foo HTTP/1.1
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {"data":"bar"}
+
+---
+
+name: POST Valid JSON
+detail: Something can go here I suppose
+request: |
+  POST /foo HTTP/1.1
+  Content-Type: application/json
+
+  {"data": "foo" }
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {"data":"bar"}
+
+---
+
+name: Can send arbitrary HTTP headers
+request: |
+  GET /echo HTTP/1.1
+  Something: somewhere
+  Everything: everywhere
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "method": "GET",
+    "headers": {
+      "something": ["somewhere"],
+      "everything": ["everywhere"]
+    },
+    "body": "...",
+    "uri": "..."
+  }
+---
+
+name: Uses the correct URI
+request: |
+  GET /echo/foo/bar/baz HTTP/1.1
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "uri": "/echo/foo/bar/baz",
+    "method": "...",
+    "headers": "...",
+    "body": "..."
+  }
+
+---
+
+name: Can submit a DELETE request
+request: |
+  DELETE /echo/abc/xyz HTTP/1.1
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+
+  {
+    "uri": "/echo/abc/xyz",
+    "method": "DELETE",
+    "headers": "...",
+    "body": "..."
+  }
+
+---
+
+name: Can expect response that doesn't declare the actual response body
+request: |
+  GET /echo/foo/bar/baz HTTP/1.1
+
+response: |
+  HTTP/1.1 200 OK
+
+---
+
+name: Will return an error message
+request: |
+  GET /conflicted HTTP/1.1
+
+response: |
+  HTTP/1.1 409 Conflict

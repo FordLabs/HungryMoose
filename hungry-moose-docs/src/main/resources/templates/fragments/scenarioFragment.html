@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en-US">
+    <body>
+        <div th:fragment="node (scenario)" th:class="scenario" th:id="${scenario.getScenarioId()}">
+            <h2 th:text="${scenario.getName()}"></h2>
+            <p th:if="${scenario.getDetail() != null}" th:text="${scenario.getDetail()}">Here comes a leg-slappingly-funny pun!</p>
+            <h3>Request</h3>
+            <pre>
+                <code th:text="${scenario.getRequest()}"></code>
+            </pre>
+            <h3>Response</h3>
+            <pre>
+                <code th:text="${scenario.getResponse()}"></code>
+            </pre>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,12 @@
+name: This test should fail
+request: |
+  GET /echo HTTP/1.1
+  
+  Marco?
+
+response: |
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+  
+  If this test does not fail, then the RapidTestRunner isn't working.
+ 
