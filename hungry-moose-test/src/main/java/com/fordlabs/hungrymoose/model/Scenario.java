@@ -17,8 +17,13 @@
 
 package com.fordlabs.hungrymoose.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class Scenario {
-    public String name;
-    public Request request;
-    public Response response;
+    private String name;
+    private Request request;
+    private Response response;
 }

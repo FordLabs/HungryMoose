@@ -53,9 +53,9 @@ public class HungryMooseTestRunner extends Runner {
         final LinkedHashMap<Description, TestCase> result = new LinkedHashMap<>();
         List<Scenario> scenarios = ScenarioParser.parse(testClass, this.testContext.getSpecFileLocation());
         for (final Scenario scenario : scenarios) {
-            final Description testDescription = Description.createTestDescription(testClass, scenario.name);
+            final Description testDescription = Description.createTestDescription(testClass, scenario.getName());
             parentDescription.addChild(testDescription);
-            result.put(testDescription, new TestCase(scenario.request, scenario.response, testClass));
+            result.put(testDescription, new TestCase(scenario.getRequest(), scenario.getResponse(), testClass));
         }
         return result;
     }

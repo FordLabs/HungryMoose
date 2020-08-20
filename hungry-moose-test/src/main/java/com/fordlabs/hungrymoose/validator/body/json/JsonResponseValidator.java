@@ -43,9 +43,7 @@ public class JsonResponseValidator implements BodyValidator {
             @Override
             public void compareValues(final String prefix, final Object expectedValue, final Object actualValue, final JSONCompareResult result)
                     throws JSONException {
-                if (expectedValue.equals("...")) {
-                    result.passed();
-                } else {
+                if (!expectedValue.equals("...")) {
                     super.compareValues(prefix, expectedValue, actualValue, result);
                 }
             }

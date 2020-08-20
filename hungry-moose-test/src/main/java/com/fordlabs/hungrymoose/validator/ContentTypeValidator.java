@@ -24,7 +24,7 @@ public class ContentTypeValidator {
 
     private static final String EXPECTED_CONTENT_TYPE_MISSING = "Content-Type missing from expected response. Content-Type is required.";
     private static final String ACTUAL_CONTENT_TYPE_MISSING = "Content-Type missing from actual response.";
-    private static final String MISMATCHED_CONTENT_TYPE = "Content-Type on actual not matching expected.\n Wanted: %s\n but found: %s";
+    private static final String MISMATCHED_CONTENT_TYPE = "Content-Type on actual not matching expected.%n Wanted: %s%n but found: %s";
 
     public static String validate(Response expectedResponse, HttpResponse actualResponse) {
         if (expectedResponseHasBodyButMissingContentType(expectedResponse)) throw new AssertionError(EXPECTED_CONTENT_TYPE_MISSING);

@@ -17,11 +17,14 @@
 
 package com.fordlabs.hungrymoose.testing;
 
-import org.apache.commons.lang3.Validate;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ActiveProfiles;
 
 class TestContextFactory {
+
+    public static final String MISSING_SPEC_FILES_TEXT = "No spec file found. Are you missing the @SpecsFromResourcePath annotation?";
+    public static final String MISSING_APPLICATION_TEXT = "No testable class found. Are you missing the @ApplicationToTest annotation?";
+
     static TestContext build(Class<?> testClass) {
         return new TestContext(
                 UriUnderTestFactory.getUriUnderTest(),
@@ -33,8 +36,8 @@ class TestContextFactory {
 
     private static Class<?> getApplicationToTest(final Class<?> testClass) {
         final ApplicationToTest annotation = AnnotationUtils.findAnnotation(testClass, ApplicationToTest.class);
-        Validate.isTrue(annotation != null, "No testable class found. Are you missing the @ApplicationToTest annotation?");
-        return annotation.value();
+        if(annotation == null) throw new IllegalArgumentException(MISSING_APPLICATION_TEXT);
+        else return annotation.value();
     }
 
     private static String[] getActiveProfiles(final Class<?> testClass) {
@@ -49,7 +52,8 @@ class TestContextFactory {
 
     private static String getSpecFileLocation(final Class<?> testClass) {
         final SpecsFromResourcePath resourceLocation = AnnotationUtils.findAnnotation(testClass, SpecsFromResourcePath.class);
-        Validate.isTrue(resourceLocation != null, "No spec file found. Are you missing the @SpecsFromResourcePath annotation?");
-        return resourceLocation.value();
+        if(resourceLocation == null) throw new IllegalArgumentException(MISSING_SPEC_FILES_TEXT);
+        else return resourceLocation.value();
     }
+
 }
