@@ -58,8 +58,10 @@ tasks.getByPath("spotbugsTest").finalizedBy(spotbugsReportTest)
 
 dependencies {
     testCompile 'junit:junit:4.12'
+
     annotationProcessor 'org.projectlombok:lombok'
-    compileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    compile 'org.projectlombok:lombok'
 
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'

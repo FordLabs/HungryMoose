@@ -190,7 +190,7 @@ public class RequestTest {
 
     @Test
     public void validateBodyWhenNotHttpGet() throws Exception {
-        final Request request = new Request("POST /someurl HTTP/1.1" + "\n" + CONTENT_TYPE_JSON + "\n" + JSON_BODY);
+        new Request("POST /someurl HTTP/1.1" + "\n" + CONTENT_TYPE_JSON + "\n" + JSON_BODY);
     }
 
     private String stripWhiteSpace(final StringBuilder requestBody) {

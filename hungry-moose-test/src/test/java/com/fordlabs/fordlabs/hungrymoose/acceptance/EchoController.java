@@ -35,14 +35,15 @@ public class EchoController {
 
     @RequestMapping(value = "/**", produces = "application/json")
     public ResponseEntity<String> getRequest(final HttpServletRequest rawRequest) throws Exception {
-        RequestDetails details = new RequestDetails();
-        details.uri = rawRequest.getRequestURI();
-        details.method = rawRequest.getMethod();
-        details.body = IOUtils.toString(rawRequest.getReader());
-        details.headers = getHeadersFromRequest(rawRequest);
+        RequestDetails details = new RequestDetails(
+                rawRequest.getRequestURI(),
+                rawRequest.getMethod(),
+                getHeadersFromRequest(rawRequest),
+                IOUtils.toString(rawRequest.getReader())
+        );
 
         String convertToJSON = convertToJSON(details);
-        return new ResponseEntity<String>(convertToJSON, HttpStatus.OK);
+        return new ResponseEntity<>(convertToJSON, HttpStatus.OK);
     }
 
     private HttpHeaders getHeadersFromRequest(final HttpServletRequest rawRequest) {
@@ -65,12 +66,4 @@ public class EchoController {
     private String convertToJSON(Object object) throws JsonProcessingException {
         return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
     }
-
-    public static class RequestDetails {
-        public String uri;
-        public String method;
-        public HttpHeaders headers;
-        public String body;
-    }
-
 }

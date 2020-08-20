@@ -19,6 +19,8 @@ package com.fordlabs.fordlabs.hungrymoose.acceptance;
 
 import com.fordlabs.hungrymoose.model.Header;
 import com.google.common.collect.ImmutableSet;
+import lombok.Data;
+import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +40,7 @@ import java.util.Set;
 @RequestMapping(value = "/rapid-stub")
 public class RapidStubController {
 
-    public static Set<String> HEADERS_TO_IGNORE = ImmutableSet.of("content-length", "host", "connection", "user-agent", "accept-encoding");
+    public static final Set<String> HEADERS_TO_IGNORE = ImmutableSet.of("content-length", "host", "connection", "user-agent", "accept-encoding");
 
     @RequestMapping(value = "/valid-json", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Object> validGetJson() {
@@ -52,7 +54,7 @@ public class RapidStubController {
 
     @RequestMapping(value = "/im-conflicted", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Object> throwConflictStatusCode() {
-        return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @RequestMapping(value = "/knock-knock-headers", method = { RequestMethod.POST, RequestMethod.GET }, produces = "application/json")
@@ -87,12 +89,14 @@ public class RapidStubController {
         return new ResponseEntity<>(content, HttpStatus.OK);
     }
 
+    @Data
     public static class JsonData {
-        public String data = "bar";
+        private String data = "bar";
     }
 
+    @Getter
     public static class JsonHeaderData {
-        public List<Header> headers;
+        private final List<Header> headers;
         JsonHeaderData(List<Header> headers) {
             this.headers = headers;
         }

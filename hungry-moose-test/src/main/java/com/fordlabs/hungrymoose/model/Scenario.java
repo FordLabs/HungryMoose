@@ -18,10 +18,7 @@
 package com.fordlabs.hungrymoose.model;
 
 public class Scenario {
-
     public String name;
-    public String detail;
     public Request request;
     public Response response;
-
 }
