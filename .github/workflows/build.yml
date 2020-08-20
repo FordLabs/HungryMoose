@@ -11,7 +11,7 @@ jobs:
         with:
           java-version: '12.x'
       - name: Run Tests
-        run: ./gradlew clean test
+        run: ./gradlew clean check
         working-directory: ./hungry-moose-docs
   test-test:
     name: Test HungryMoose Test Library
