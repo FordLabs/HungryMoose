@@ -41,7 +41,8 @@ test {
     }
 }
 
-//More spotbugs properties can be found here -> https://spotbugs-gradle-plugin.netlify.app/com/github/spotbugs/snom/spotbugsextension
+// More spotbugs properties can be found here -> https://spotbugs-gradle-plugin.netlify.app/com/github/spotbugs/snom/spotbugsextension
+// Bug descriptions -> https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html
 tasks.matching { it.name.startsWith("spotbugs") }.each {
     it.reports {
         text.enabled = true

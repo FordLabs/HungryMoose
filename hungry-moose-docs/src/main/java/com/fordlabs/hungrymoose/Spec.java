@@ -64,8 +64,8 @@ public class Spec extends File {
     }
 
     public List<Scenario> getScenarios() throws ScenarioParsingException {
-        try {
-            YAMLParser yamlParser = new YAMLFactory().createParser(new FileInputStream(this));
+        try(FileInputStream fileStream = new FileInputStream(this)) {
+            YAMLParser yamlParser = new YAMLFactory().createParser(fileStream);
             ObjectMapper mapper = new ObjectMapper();
             mapper.findAndRegisterModules();
             return mapper.readValues(yamlParser, new TypeReference<Scenario>(){}).readAll();

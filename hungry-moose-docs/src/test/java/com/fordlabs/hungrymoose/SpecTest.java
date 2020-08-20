@@ -29,7 +29,7 @@ class SpecTest {
 
     @Test
     void reportsNoChildrenWhenGivenANonexistentDirectory() {
-        Spec actual = new Spec("/kjhsdfjgjsarbgkjer");
+        Spec actual = new Spec("asdasdasd/kjhsdfjgjsarbgkjer");
         assertThat(actual.getChildren()).isEmpty();
     }
 
