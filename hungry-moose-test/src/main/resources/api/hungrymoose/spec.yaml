@@ -1,6 +1,6 @@
 name: GET Valid JSON
 request: |
-  GET /rapid-stub/valid-json HTTP/1.1
+  GET /rapid-stub/valid-json
 
 response: |
   HTTP/1.1 200 OK
@@ -12,7 +12,7 @@ response: |
 
 name: POST Valid JSON
 request: |
-  POST /rapid-stub/valid-json HTTP/1.1
+  POST /rapid-stub/valid-json
   Content-Type: application/json
 
   {"data": "foo" }
@@ -27,7 +27,7 @@ response: |
 
 name: Headers will be preserved
 request: |
-  POST /rapid-stub/knock-knock-headers json HTTP/1.1
+  POST /rapid-stub/knock-knock-headers
   Content-Type: application/json
   EstherWho: EstherBunny
   AnaWho: AnAnotherEasterBunny
@@ -48,7 +48,7 @@ response: |
 
 name: Headers will be preserved on GET
 request: |
-  GET /rapid-stub/knock-knock-headers json HTTP/1.1
+  GET /rapid-stub/knock-knock-headers
   EstherWho: EstherBunny
   AnaWho: AnAnotherEasterBunny
   StillWho: StillAnotherEasterBunny
@@ -69,7 +69,7 @@ response: |
 
 name: Can send arbitrary HTTP headers
 request: |
-  GET /echo HTTP/1.1
+  GET /echo
   Something: somewhere
   Everything: everywhere
 
@@ -90,7 +90,7 @@ response: |
 
 name: Uses the correct URI
 request: |
-  GET /echo/foo/bar/baz HTTP/1.1
+  GET /echo/foo/bar/baz
 
 response: |
   HTTP/1.1 200 OK
@@ -106,7 +106,7 @@ response: |
 ---
 name: Can submit a PUT request
 request: |
-  PUT /echo/12345 HTTP/1.1
+  PUT /echo/12345
   Content-Type: application/xml
 
   <data>here ya go</data>
@@ -126,7 +126,7 @@ response: |
 
 name: Can submit a DELETE request
 request: |
-  DELETE /echo/abc/xyz HTTP/1.1
+  DELETE /echo/abc/xyz
 
 response: |
   HTTP/1.1 200 OK
@@ -143,7 +143,7 @@ response: |
 
 name: Can expect response that doesn't declare the actual response body
 request: |
-  GET /echo/foo/bar/baz HTTP/1.1
+  GET /echo/foo/bar/baz
 
 response: |
   HTTP/1.1 200 OK
@@ -152,7 +152,7 @@ response: |
 
 name: Property Set Id will return 409 Not Found
 request: |
-  GET /rapid-stub/im-conflicted HTTP/1.1
+  GET /rapid-stub/im-conflicted
 
 response: |
   HTTP/1.1 409 Conflict

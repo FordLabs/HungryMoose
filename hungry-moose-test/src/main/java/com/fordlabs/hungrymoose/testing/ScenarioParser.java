@@ -35,7 +35,7 @@ public class ScenarioParser {
             return mapper.readValues(yamlParser, new TypeReference<Scenario>(){}).readAll();
         }
         catch (Exception e) {
-            throw new IllegalArgumentException("Unable to load resource from " + fileName, e);
+            throw new IllegalArgumentException("Unable to load resource from " + fileName + ": " + e.getMessage(), e);
         }
     }
 }

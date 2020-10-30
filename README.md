@@ -31,7 +31,7 @@ dashes `---` Each *scenario* is made up of four fields as described below.
 The request object would look like something similar to this:
 
 ```$xslt
-POST /endpoint/to/hit HTTP/1.1
+POST /endpoint/to/hit
 Content-Type: application/json
 
 {"data": "foo" }
@@ -51,7 +51,7 @@ A complete file with two examples would look like this:
 ```$xslt
 name: Can send arbitrary HTTP headers
 request: |
-  GET /echo HTTP/1.1
+  GET /echo
   Something: somewhere
   Everything: everywhere
 
@@ -73,7 +73,7 @@ response: |
 
 name: Can submit a PUT request
 request: |
-  PUT /echo HTTP/1.1
+  PUT /echo
   Content-Type: application/xml
 
   {"data":"here ya go"}

@@ -1,6 +1,6 @@
 name: This test should fail
 request: |
-  GET /echo HTTP/1.1
+  GET /echo
   
   Marco?
 

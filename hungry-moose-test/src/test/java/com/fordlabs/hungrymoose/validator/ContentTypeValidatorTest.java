@@ -18,11 +18,13 @@
 package com.fordlabs.hungrymoose.validator;
 
 import com.fordlabs.hungrymoose.model.Response;
-import org.apache.http.*;
-import org.springframework.http.HttpHeaders;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 

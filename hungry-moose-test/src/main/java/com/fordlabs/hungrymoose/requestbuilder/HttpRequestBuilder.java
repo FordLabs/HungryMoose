@@ -43,7 +43,7 @@ public abstract class HttpRequestBuilder {
                 .scheme(serverUnderTest.getTransferProtocol())
                 .host(serverUnderTest.getHost())
                 .port(serverUnderTest.getPort())
-                .path(requestToTest.getURI().getPath());
+                .path(requestToTest.getUri().getPath());
 
         addQueryParams(uriBuilder, requestToTest.getQueryParams());
         return uriBuilder.build().toUri();

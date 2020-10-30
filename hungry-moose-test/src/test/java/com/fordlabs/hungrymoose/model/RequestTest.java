@@ -17,217 +17,118 @@
 
 package com.fordlabs.hungrymoose.model;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static com.fordlabs.hungrymoose.model.HttpMethod.GET;
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RequestTest {
 
-    private static final String JSON_BODY = "{\"body\":\"value\"}";
-    private static final String CONTENT_TYPE_JSON = "Content-Type: application/json";
-    private static final String CONTENT_TYPE_XML = "Content-Type: application/xml";
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void canDetermineTheHttpMethod_GET() throws Exception {
-        final Request request = new Request("GET /someurl HTTP/1.1" + "\n" + CONTENT_TYPE_JSON + "\n" + JSON_BODY);
-        assertThat(request.getMethod(), is(HttpMethod.GET));
-    }
+    public void parse_withValidRequestLine_ReturnsRequestWithUriAndMethod() throws URISyntaxException {
+        final String requestLine = "GET /someurl\n";
+        Request actualRequest = Request.from(requestLine);
 
-    @Test
-    public void canDetermineTheHttpMethod_POST() throws Exception {
-        final Request request = new Request("POST /someurl HTTP/1.1" + "\n" + CONTENT_TYPE_JSON + "\n" + JSON_BODY);
-        assertThat(request.getMethod(), is(HttpMethod.POST));
+        assertThat(actualRequest.getMethod()).isEqualTo(GET);
+        assertThat(actualRequest.getUri()).isEqualTo(new URI("/someurl"));
     }
 
     @Test
-    public void throwsAnErrorIfHttpMethodIsBogus() throws Exception {
-        try {
-            new Request("BOGUS /someurl HTTP/1.1");
-            fail("why no go boom?");
-        } catch (final RuntimeException e) {
-            assertThat(e.getMessage(), is("Invalid HttpMethod: BOGUS"));
-        }
+    public void parse_withQueryParams_ReturnsRequestWithQueryParams() {
+        final String requestLine = "GET /someurl?v1=1&v2=two\n";
+        final List<NameValuePair> expectedQueryParameters = asList(
+                new BasicNameValuePair("v1", "1"),
+                new BasicNameValuePair("v2", "two")
+            ) ;
+
+        Request actualRequest = Request.from(requestLine);
+
+        assertThat(actualRequest.getQueryParams()).isEqualTo(expectedQueryParameters);
     }
 
     @Test
-    public void canRecognizeASimpleURI() throws Exception {
-        final Request request = new Request("POST /simpleURI HTTP/1.1" + "\n" + CONTENT_TYPE_XML + "\n" + JSON_BODY);
-        assertThat(request.getURI(), is(new URI("/simpleURI")));
+    public void parse_withInvalidHttpMethod_ThrowsInvalidRequestException() {
+        final String requestLine = "BOGUS /someurl\n";
+
+        expectedException.expect(InvalidRequestException.class);
+        expectedException.expectMessage("'BOGUS' is not a valid HTTP method");
+
+        Request.from(requestLine);
     }
 
     @Test
-    public void canRecognizeAFunkyURI() throws Exception {
-        final Request request = new Request("GET /some-funky/uri/with/slashes-and-dashes?andQuery=1&strings=2 HTTP/1.1" + "\n" + CONTENT_TYPE_JSON + "\n"
-                + JSON_BODY);
-        assertThat(request.getURI(), is(new URI("/some-funky/uri/with/slashes-and-dashes?andQuery=1&strings=2")));
+    public void parse_withTooManyValuesInRequestLine_ThrowsInvalidRequestException() {
+        final String requestLine = "GET /someurl and more phrases \n";
+
+        expectedException.expect(InvalidRequestException.class);
+        expectedException.expectMessage("Request line has too many values. Should contain only the HTTP Method and request URI");
+
+        Request.from(requestLine);
     }
 
     @Test
-    public void throwsAnErrorIfTheURIIsBogus() throws Exception {
-        try {
-            new Request("POST /\\huh??/#% HTTP/1.1");
-            fail("why no boom?");
-        } catch (final RuntimeException e) {
-            assertThat(e.getMessage(), is("Invalid URI: /\\huh??/#%"));
-        }
+    public void parse_withInvalidUrl_ThrowsInvalidRequestException() {
+        final String requestLine = "GET \\backslash \n";
+
+        expectedException.expect(InvalidRequestException.class);
+        expectedException.expectMessage("URL has an invalid format");
+
+        Request.from(requestLine);
     }
 
     @Test
-    public void canReadXML() throws Exception {
-        final StringBuilder requestHeaderBuilder = buildXmlHeader();
-        final StringBuilder requestBody = new StringBuilder();
-        requestBody.append("<request></request>");
-        requestHeaderBuilder.append(requestBody.toString());
-
-        final Request request = new Request(requestHeaderBuilder.toString());
-        assertThat(request.getBody(), is("<request></request>"));
-
+    public void parse_withHeaders_ReturnsRequestWithHeaders() {
+        String requestWithHeaders = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\n";
+        Header expectedContentType = new Header("Content-Type", "application/json");
+        Header expectedAuthorization = new Header("Authorization", "value");
+        Request request = Request.from(requestWithHeaders);
+        assertThat(request.getHeaders()).containsExactlyInAnyOrder(expectedContentType, expectedAuthorization);
     }
 
     @Test
-    public void canParseBody() throws Exception {
-        final StringBuilder requestHeaderBuilder = buildJsonHeader();
-        final StringBuilder requestBody = new StringBuilder();
-        requestBody.append("Something");
-        requestBody.append("OtherLineWith Stuff\n");
-        requestBody.append("moreLines of Stuff");
-        requestHeaderBuilder.append(requestBody.toString());
-
-        final Request request = new Request(requestHeaderBuilder.toString());
-        assertThat(request.getBody(), is(stripWhiteSpace(requestBody)));
+    public void parse_withoutBlankLineAfterHeaders_ReturnsRequestWithHeaders() {
+        String requestWithHeaders = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n";
+        Header expectedContentType = new Header("Content-Type", "application/json");
+        Header expectedAuthorization = new Header("Authorization", "value");
+        Request request = Request.from(requestWithHeaders);
+        assertThat(request.getHeaders()).containsExactlyInAnyOrder(expectedContentType, expectedAuthorization);
     }
 
     @Test
-    public void canParseContentType() throws Exception {
-        final StringBuilder requestBuilder = buildJsonHeader();
-        requestBuilder.append(JSON_BODY);
+    public void parse_withMalformedHeader_ThrowsInvalidRequestException() {
+        String requestWithHeaders = "GET /someUrl\nContent-Type((( application/json\n";
+        expectedException.expect(InvalidRequestException.class);
+        expectedException.expectMessage("Cannot parse header: Content-Type((( application/json");
 
-        final Request request = new Request(requestBuilder.toString());
-        assertThat(request.getContentType(), is("application/json"));
+        Request.from(requestWithHeaders);
     }
 
     @Test
-    public void canParseHttpHeaders() throws Exception {
-        final StringBuilder requestBuilder = buildCustomHeader(
-                new Header("header1", "value1"),
-                new Header("header2", "value2"));
-        requestBuilder.append(JSON_BODY);
-
-        final Request request = new Request(requestBuilder.toString());
-        assertThat(request.getContentType(), is("application/json"));
-        assertThat(request.getHeaders(), hasItem(new Header("header1", "value1")));
-        assertThat(request.getHeaders(), hasItem(new Header("header2", "value2")));
+    public void parse_withBody_ReturnsRequestWithBody() {
+        String requestString = "GET /someUrl\n\nBody\nContent\nExists\nHere\n\n";
+        Request request = Request.from(requestString);
+        assertThat(request.getBody()).isEqualTo("Body\nContent\nExists\nHere");
     }
 
     @Test
-    public void canParseHttpHeadersWithGet() throws Exception {
-        final StringBuilder requestBuilder = buildCustomHeader("GET",
-                new Header("header1", "value1"),
-                new Header("header2", "value2"));
-
-        final Request request = new Request(requestBuilder.toString());
-        assertThat(request.getContentType(), is(""));
-        assertThat(request.getHeaders(), hasItem(new Header("header1", "value1")));
-        assertThat(request.getHeaders(), hasItem(new Header("header2", "value2")));
+    public void parse_withBodyAndHeaders_ReturnsRequestWithBodyAndHeaders() {
+        String requestString = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\nBody\nContent\nExists\nHere";
+        Header expectedContentType = new Header("Content-Type", "application/json");
+        Header expectedAuthorization = new Header("Authorization", "value");
+        Request request = Request.from(requestString);
+        assertThat(request.getHeaders()).containsExactlyInAnyOrder(expectedContentType, expectedAuthorization);
+        assertThat(request.getBody()).isEqualTo("Body\nContent\nExists\nHere");
     }
-
-    @Test
-    public void canParseHttpHeadersWithTimestamps() throws Exception {
-        String headerValueOne = "2015-01-01T05:05:05Z";
-        String headerValueTwo = "2050-12-31T23:15:55Z";
-
-        final StringBuilder requestBuilder = buildCustomHeader("GET",
-                new Header("timestamp1", headerValueOne),
-                new Header("timestamp2", headerValueTwo));
-
-        final Request request = new Request(requestBuilder.toString());
-        assertThat(request.getContentType(), is(""));
-        assertThat(request.getHeaders(), hasItem(new Header("timestamp1", headerValueOne)));
-        assertThat(request.getHeaders(), hasItem(new Header("timestamp2", headerValueTwo)));
-    }
-
-    @Test
-    public void shouldParseRequestBody() throws Exception {
-        final StringBuilder requestBuilder = buildCustomHeader(
-                new Header("header1", "value1"),
-                new Header("header2", "value2"));
-        requestBuilder.append(JSON_BODY);
-
-        final Request request = new Request(requestBuilder.toString());
-        assertThat(request.getBody(), is(JSON_BODY));
-    }
-
-    @Test
-    public void throwsAnErrorIfMissingContentType() throws Exception {
-        try {
-            new Request("POST /someurl HTTP/1.1" + JSON_BODY);
-            fail("why no boom?");
-        } catch (final RuntimeException e) {
-            assertThat(e.getMessage(), is("Missing Content-Type"));
-        }
-    }
-
-    @Test
-    public void getRequestThatHasNoBodyAndNoContentType() throws Exception {
-        final Request request = new Request("GET /someurl HTTP/1.1");
-        assertThat(request.getURI().toString(), is("/someurl"));
-        assertThat(request.getBody(), is(""));
-        assertThat(request.getMethod(), is(HttpMethod.GET));
-    }
-
-    @Test
-    public void deleteRequestThatHasNoBodyAndNoContentType() throws Exception {
-        final Request request = new Request("DELETE /someurl HTTP/1.1");
-        assertThat(request.getURI().toString(), is("/someurl"));
-        assertThat(request.getBody(), is(""));
-        assertThat(request.getMethod(), is(HttpMethod.DELETE));
-    }
-
-    @Test
-    public void validateBodyWhenNotHttpGet() throws Exception {
-        new Request("POST /someurl HTTP/1.1" + "\n" + CONTENT_TYPE_JSON + "\n" + JSON_BODY);
-    }
-
-    private String stripWhiteSpace(final StringBuilder requestBody) {
-        final String responseBody = requestBody.toString();
-        final String strippedResponseBody = responseBody.replace("\n", "");
-        return strippedResponseBody.trim();
-    }
-
-    private StringBuilder buildJsonHeader() {
-        final StringBuilder requestBuilder = new StringBuilder();
-        requestBuilder.append("POST /validation/is-compatible HTTP/1.1\n");
-        requestBuilder.append("Content-Type: application/json\n");
-        requestBuilder.append("\n");
-        return requestBuilder;
-    }
-
-    private StringBuilder buildCustomHeader(final Header... headers) {
-        return buildCustomHeader("POST", headers);
-    }
-
-    private StringBuilder buildCustomHeader(final String method, final Header... headers) {
-        final StringBuilder requestBuilder = new StringBuilder();
-        requestBuilder.append(method.concat(" /validation/is-compatible HTTP/1.1\n"));
-        requestBuilder.append("Content-Type: application/json\n");
-        for (final Header header : headers) {
-            requestBuilder.append(header.getName()).append(": ").append(header.getValue()).append("\n");
-        }
-        requestBuilder.append("\n");
-        return requestBuilder;
-    }
-
-    private StringBuilder buildXmlHeader() {
-        final StringBuilder requestBuilder = new StringBuilder();
-        requestBuilder.append("POST /validation/is-compatible HTTP/1.1\n");
-        requestBuilder.append("Content-Type: application/xml\n");
-        requestBuilder.append("\n");
-        return requestBuilder;
-    }
-
 }

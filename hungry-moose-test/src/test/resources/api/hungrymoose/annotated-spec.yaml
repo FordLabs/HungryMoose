@@ -1,6 +1,6 @@
 name: Can expect response that doesn't declare the actual response body
 request: |
-  GET /echo/foo/bar/baz HTTP/1.1
+  GET /echo/foo/bar/baz
 
 response: |
   HTTP/1.1 200 OK
