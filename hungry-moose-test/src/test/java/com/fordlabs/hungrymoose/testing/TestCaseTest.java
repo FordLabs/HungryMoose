@@ -71,7 +71,7 @@ public class TestCaseTest {
     public void continuesOnIfThereIsNoExpectedBody() {
         String expectedBody = "";
 
-        Response expectedResponse = Response.parseResponse("HTTP/1.1 " + HttpStatus.OK + " OK" + "\n" + "Content-Type: application/json" + "\n\n" + expectedBody);
+        Response expectedResponse = new Response("200 OK\n" + "Content-Type: application/json" + "\n\n" + expectedBody);
         TestCase testCase = new TestCase(null, expectedResponse, null);
 
         testCase.assertResponseBody(ACTUAL_BODY, JSON);
@@ -138,9 +138,6 @@ public class TestCaseTest {
     }
 
     private static Response buildResponse(String mediaType, String body) {
-        String protocol = "HTTP/1.1";
-        String reasonString = "OK";
-
-        return Response.parseResponse(protocol + " " + HttpStatus.OK + " " + reasonString + "\n" + mediaType + "\n\n" + body);
+        return new Response("200 OK\n" + mediaType + "\n\n" + body);
     }
 }

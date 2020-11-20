@@ -40,7 +40,7 @@ Content-Type: application/json
 and a response would look somthing like this:
 
 ```$xslt
-HTTP/1.1 200 OK
+200 OK
 Content-Type: application/json
 
 {"data":"bar"}
@@ -56,7 +56,7 @@ request: |
   Everything: everywhere
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {
@@ -79,7 +79,7 @@ request: |
   {"data":"here ya go"}
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {

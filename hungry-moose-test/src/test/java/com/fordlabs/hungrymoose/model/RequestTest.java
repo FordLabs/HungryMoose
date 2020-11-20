@@ -39,7 +39,7 @@ public class RequestTest {
     @Test
     public void parse_withValidRequestLine_ReturnsRequestWithUriAndMethod() throws URISyntaxException {
         final String requestLine = "GET /someurl\n";
-        Request actualRequest = Request.from(requestLine);
+        Request actualRequest = new Request(requestLine);
 
         assertThat(actualRequest.getMethod()).isEqualTo(GET);
         assertThat(actualRequest.getUri()).isEqualTo(new URI("/someurl"));
@@ -53,7 +53,7 @@ public class RequestTest {
                 new BasicNameValuePair("v2", "two")
             ) ;
 
-        Request actualRequest = Request.from(requestLine);
+        Request actualRequest = new Request(requestLine);
 
         assertThat(actualRequest.getQueryParams()).isEqualTo(expectedQueryParameters);
     }
@@ -65,7 +65,7 @@ public class RequestTest {
         expectedException.expect(InvalidRequestException.class);
         expectedException.expectMessage("'BOGUS' is not a valid HTTP method");
 
-        Request.from(requestLine);
+        new Request(requestLine);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class RequestTest {
         expectedException.expect(InvalidRequestException.class);
         expectedException.expectMessage("Request line has too many values. Should contain only the HTTP Method and request URI");
 
-        Request.from(requestLine);
+        new Request(requestLine);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class RequestTest {
         expectedException.expect(InvalidRequestException.class);
         expectedException.expectMessage("URL has an invalid format");
 
-        Request.from(requestLine);
+        new Request(requestLine);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class RequestTest {
         String requestWithHeaders = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\n";
         Header expectedContentType = new Header("Content-Type", "application/json");
         Header expectedAuthorization = new Header("Authorization", "value");
-        Request request = Request.from(requestWithHeaders);
+        Request request = new Request(requestWithHeaders);
         assertThat(request.getHeaders()).containsExactlyInAnyOrder(expectedContentType, expectedAuthorization);
     }
 
@@ -102,7 +102,7 @@ public class RequestTest {
         String requestWithHeaders = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n";
         Header expectedContentType = new Header("Content-Type", "application/json");
         Header expectedAuthorization = new Header("Authorization", "value");
-        Request request = Request.from(requestWithHeaders);
+        Request request = new Request(requestWithHeaders);
         assertThat(request.getHeaders()).containsExactlyInAnyOrder(expectedContentType, expectedAuthorization);
     }
 
@@ -112,13 +112,13 @@ public class RequestTest {
         expectedException.expect(InvalidRequestException.class);
         expectedException.expectMessage("Cannot parse header: Content-Type((( application/json");
 
-        Request.from(requestWithHeaders);
+        new Request(requestWithHeaders);
     }
 
     @Test
     public void parse_withBody_ReturnsRequestWithBody() {
         String requestString = "GET /someUrl\n\nBody\nContent\nExists\nHere\n\n";
-        Request request = Request.from(requestString);
+        Request request = new Request(requestString);
         assertThat(request.getBody()).isEqualTo("Body\nContent\nExists\nHere");
     }
 
@@ -127,7 +127,7 @@ public class RequestTest {
         String requestString = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\nBody\nContent\nExists\nHere";
         Header expectedContentType = new Header("Content-Type", "application/json");
         Header expectedAuthorization = new Header("Authorization", "value");
-        Request request = Request.from(requestString);
+        Request request = new Request(requestString);
         assertThat(request.getHeaders()).containsExactlyInAnyOrder(expectedContentType, expectedAuthorization);
         assertThat(request.getBody()).isEqualTo("Body\nContent\nExists\nHere");
     }

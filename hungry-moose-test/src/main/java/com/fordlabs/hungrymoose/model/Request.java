@@ -38,10 +38,6 @@ public class Request {
     private final List<Header> headers;
     private final String body;
 
-    public static Request from(final String textRepresentation) {
-        return new Request(textRepresentation);
-    }
-
     public Request(final String textRepresentation) {
         try(Scanner scanner = new Scanner(textRepresentation)) {
             String requestLine = scanner.nextLine();

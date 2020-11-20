@@ -18,9 +18,7 @@
 package com.fordlabs.hungrymoose.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.ParseException;
 import org.apache.http.StatusLine;
-import org.apache.http.message.BasicLineParser;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,22 +31,34 @@ import java.util.regex.Pattern;
 
 public class Response {
 
-    public static Response parseResponse(final String textRepresentation) {
-        StatusLine statusLine = readStatusLine(textRepresentation);
-        HttpHeaders headers = readHeaders(textRepresentation);
-        String body = readBody(textRepresentation);
+    private final int statusCode;
+    private final String reasonPhrase;
+    private final HttpHeaders headers;
+    private final String body;
 
-        return new Response(statusLine, headers, body);
+    private static int readStatusCode(final String responseLine) {
+        String responseCode = responseLine.substring(0, responseLine.indexOf(' '));
+        try {
+            return HttpStatus.valueOf(Integer.parseInt(responseCode)).value();
+        } catch (Exception e) {
+            throw new InvalidResponseException(String.format("'%s' is not a valid Status Code", responseCode));
+        }
     }
 
-    private static StatusLine readStatusLine(final String requestText) {
-        final Scanner scanner = new Scanner(requestText);
-        final String line = scanner.nextLine();
-        scanner.close();
+    private static String readReasonPhrase(final String responseLine) {
+        String reasonPhrase = responseLine.stripTrailing().substring(responseLine.indexOf(' ') + 1);
         try {
-            return BasicLineParser.parseStatusLine(line, BasicLineParser.INSTANCE);
-        } catch (final ParseException e) {
-            throw new RuntimeException("Invalid HTTP status line: \"" + line + "\"");
+            String enumeratedReasonPhrase = reasonPhrase.replaceAll(" ", "_").toUpperCase();
+            HttpStatus.valueOf(enumeratedReasonPhrase);
+            return reasonPhrase;
+        } catch (Exception e) {
+            throw new InvalidResponseException(String.format("'%s' is not a valid Reason Phrase", reasonPhrase));
+        }
+    }
+
+    private void checkCodeAndPhraseCompatibility() {
+        if (!HttpStatus.valueOf(this.statusCode).getReasonPhrase().equals(this.reasonPhrase)) {
+            throw new InvalidResponseException("Status Code and Reason Phrase do not match");
         }
     }
 
@@ -64,7 +74,7 @@ public class Response {
                 scanner.next(headerPattern);
             } catch (final InputMismatchException e) {
                 final String message = MessageFormat.format("Invalid HTTP header: \"{0}\". Expected a key:value pair", scanner.next());
-                throw new RuntimeException(message, e);
+                throw new InvalidResponseException(message, e);
             }
             final MatchResult match = scanner.match();
             final String key = match.group(1).trim();
@@ -89,37 +99,31 @@ public class Response {
         return requestText.split("\n\n", 2);
     }
 
-    private final StatusLine statusLine;
-    private final HttpHeaders headers;
-    private final String body;
-
     @SuppressWarnings("unused")
     public Response(String textRepresentation) {
-        this.statusLine = readStatusLine(textRepresentation);
-        this.headers = readHeaders(textRepresentation);
-        this.body = readBody(textRepresentation);
+        try(Scanner scanner = new Scanner(textRepresentation)) {
+            String requestLine = scanner.nextLine();
+            this.statusCode = readStatusCode(requestLine);
+            this.reasonPhrase = readReasonPhrase(requestLine);
+            checkCodeAndPhraseCompatibility();
+            this.headers = readHeaders(textRepresentation);
+            this.body = readBody(textRepresentation);
+        }
     }
 
     public Response(StatusLine statusLine, HttpHeaders headers, String body) {
-        this.statusLine = statusLine;
+        this.statusCode = 0;
+        this.reasonPhrase = null;
         this.headers = headers;
         this.body = body;
     }
 
-    public String getBody() {
-        return this.body;
-    }
-
-    public String getHeader() {
-        return getStatusLine().toString();
-    }
-
-    public StatusLine getStatusLine() {
-        return this.statusLine;
-    }
-
     public HttpStatus getStatusCode() {
-        return HttpStatus.valueOf(getStatusLine().getStatusCode());
+        return HttpStatus.valueOf(this.statusCode);
+    }
+
+    public String getReasonPhrase() {
+        return this.reasonPhrase;
     }
 
     public MediaType getContentType() {
@@ -128,5 +132,9 @@ public class Response {
 
     public HttpHeaders getHeaders() {
         return this.headers;
+    }
+
+    public String getBody() {
+        return this.body;
     }
 }

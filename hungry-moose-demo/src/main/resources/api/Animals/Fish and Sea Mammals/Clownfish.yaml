@@ -1,9 +1,9 @@
 name: A joke about the forest
 detail: Here comes a leg-slappingly-funny pun!
 request: |
-  GET /what/do/you/call/a/bear/with/no/teeth HTTP/1.1
+  GET /what/do/you/call/a/bear/with/no/teeth
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   
   A gummy bear.
 ---

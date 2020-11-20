@@ -3,7 +3,7 @@ request: |
   GET /rapid-stub/valid-json
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {"data":"bar"}
@@ -18,7 +18,7 @@ request: |
   {"data": "foo" }
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {"data":"bar"}
@@ -35,7 +35,7 @@ request: |
   {"data": "foo" }
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {"headers":[
@@ -56,7 +56,7 @@ request: |
 
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {"headers":[
@@ -74,7 +74,7 @@ request: |
   Everything: everywhere
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {
@@ -93,7 +93,7 @@ request: |
   GET /echo/foo/bar/baz
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {
@@ -112,7 +112,7 @@ request: |
   <data>here ya go</data>
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {
@@ -129,7 +129,7 @@ request: |
   DELETE /echo/abc/xyz
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
   Content-Type: application/json
 
   {
@@ -146,7 +146,7 @@ request: |
   GET /echo/foo/bar/baz
 
 response: |
-  HTTP/1.1 200 OK
+  200 OK
 
 ---
 
@@ -155,4 +155,4 @@ request: |
   GET /rapid-stub/im-conflicted
 
 response: |
-  HTTP/1.1 409 Conflict
+  409 Conflict
