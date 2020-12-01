@@ -1,8 +1,8 @@
 name: build
 on: [push]
 jobs:
-  test-docs:
-    name: Test HungryMoose Docs Library
+  build-docs:
+    name: Build HungryMoose Docs Library
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -13,8 +13,8 @@ jobs:
       - name: Run Tests
         run: ./gradlew clean check
         working-directory: ./hungry-moose-docs
-  test-test:
-    name: Test HungryMoose Test Library
+  build-test:
+    name: Build HungryMoose Test Library
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
