@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 public class Response {
 
     private final HttpStatus statusCode;
-    private final String reasonPhrase;
     private final HttpHeaders headers;
     private final String body;
 
@@ -41,8 +40,7 @@ public class Response {
         try(Scanner scanner = new Scanner(textRepresentation)) {
             String responseLine = scanner.nextLine();
             this.statusCode = readStatusCode(responseLine);
-            this.reasonPhrase = readReasonPhrase(responseLine);
-            checkCodeAndPhraseCompatibility();
+            checkCodeAndPhraseCompatibility(this.statusCode, readReasonPhrase(responseLine));
             this.headers = readHeaders(textRepresentation);
             this.body = readBody(textRepresentation);
         }
@@ -68,8 +66,8 @@ public class Response {
         }
     }
 
-    private void checkCodeAndPhraseCompatibility() {
-        if (!this.statusCode.getReasonPhrase().equals(this.reasonPhrase)) {
+    private static void checkCodeAndPhraseCompatibility(HttpStatus statusCode, String reasonPhrase) {
+        if (!statusCode.getReasonPhrase().equals(reasonPhrase)) {
             throw new InvalidResponseException("Status Code and Reason Phrase do not match");
         }
     }

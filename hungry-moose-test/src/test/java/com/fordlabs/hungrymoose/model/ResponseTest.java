@@ -35,12 +35,11 @@ public class ResponseTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void parse_withValidResponseLine_ReturnsRequestWithStatusCodeAndReason() {
+    public void parse_withValidResponseLine_ReturnsRequestWithStatusCode() {
         final String responseLine = "400 Bad Request      \n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY;
         Response actualResponse = new Response(responseLine);
 
         assertThat(actualResponse.getStatusCode()).isEqualTo(BAD_REQUEST);
-        assertThat(actualResponse.getReasonPhrase()).isEqualTo(BAD_REQUEST.getReasonPhrase());
     }
 
     @Test
