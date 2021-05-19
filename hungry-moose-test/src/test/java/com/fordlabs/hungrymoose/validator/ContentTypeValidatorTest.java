@@ -24,9 +24,6 @@ import org.apache.http.HttpResponse;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -99,10 +96,10 @@ public class ContentTypeValidatorTest {
     }
 
     private Response createExpectedResponse(String contentType, String bodyContent) {
-        MultiValueMap<String, String> headersMap = new LinkedMultiValueMap<>();
-        headersMap.add("Content-Type", contentType);
-        org.springframework.http.HttpHeaders headers = new HttpHeaders(headersMap);
-        return new Response(null, headers,bodyContent);
+        String responseLine = "200 OK\n";
+        String contentTypeHeader = contentType == null ? "\n\n" : String.format("Content-Type:%s%n%n", contentType);
+
+        return new Response(responseLine + contentTypeHeader + bodyContent);
     }
 
     private HttpResponse createActualResponse(String contentType) {
