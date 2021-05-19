@@ -17,8 +17,8 @@
 
 package com.fordlabs.hungrymoose.model;
 
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.StatusLine;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,17 +29,29 @@ import java.util.Scanner;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
+@Getter
 public class Response {
 
-    private final int statusCode;
+    private final HttpStatus statusCode;
     private final String reasonPhrase;
     private final HttpHeaders headers;
     private final String body;
 
-    private static int readStatusCode(final String responseLine) {
+    public Response(String textRepresentation) {
+        try(Scanner scanner = new Scanner(textRepresentation)) {
+            String responseLine = scanner.nextLine();
+            this.statusCode = readStatusCode(responseLine);
+            this.reasonPhrase = readReasonPhrase(responseLine);
+            checkCodeAndPhraseCompatibility();
+            this.headers = readHeaders(textRepresentation);
+            this.body = readBody(textRepresentation);
+        }
+    }
+
+    private static HttpStatus readStatusCode(final String responseLine) {
         String responseCode = responseLine.substring(0, responseLine.indexOf(' '));
         try {
-            return HttpStatus.valueOf(Integer.parseInt(responseCode)).value();
+            return HttpStatus.valueOf(Integer.parseInt(responseCode));
         } catch (Exception e) {
             throw new InvalidResponseException(String.format("'%s' is not a valid Status Code", responseCode));
         }
@@ -57,7 +69,7 @@ public class Response {
     }
 
     private void checkCodeAndPhraseCompatibility() {
-        if (!HttpStatus.valueOf(this.statusCode).getReasonPhrase().equals(this.reasonPhrase)) {
+        if (!this.statusCode.getReasonPhrase().equals(this.reasonPhrase)) {
             throw new InvalidResponseException("Status Code and Reason Phrase do not match");
         }
     }
@@ -97,44 +109,5 @@ public class Response {
 
     private static String[] splitTopAndBodySections(final String requestText) {
         return requestText.split("\n\n", 2);
-    }
-
-    @SuppressWarnings("unused")
-    public Response(String textRepresentation) {
-        try(Scanner scanner = new Scanner(textRepresentation)) {
-            String requestLine = scanner.nextLine();
-            this.statusCode = readStatusCode(requestLine);
-            this.reasonPhrase = readReasonPhrase(requestLine);
-            checkCodeAndPhraseCompatibility();
-            this.headers = readHeaders(textRepresentation);
-            this.body = readBody(textRepresentation);
-        }
-    }
-
-    public Response(StatusLine statusLine, HttpHeaders headers, String body) {
-        this.statusCode = 0;
-        this.reasonPhrase = null;
-        this.headers = headers;
-        this.body = body;
-    }
-
-    public HttpStatus getStatusCode() {
-        return HttpStatus.valueOf(this.statusCode);
-    }
-
-    public String getReasonPhrase() {
-        return this.reasonPhrase;
-    }
-
-    public MediaType getContentType() {
-        return this.headers.getContentType();
-    }
-
-    public HttpHeaders getHeaders() {
-        return this.headers;
-    }
-
-    public String getBody() {
-        return this.body;
     }
 }

@@ -19,6 +19,10 @@ package com.fordlabs.hungrymoose.validator;
 
 import com.fordlabs.hungrymoose.model.Response;
 import org.apache.http.HttpResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
+import java.util.Objects;
 
 public class ContentTypeValidator {
 
@@ -27,25 +31,15 @@ public class ContentTypeValidator {
     private static final String MISMATCHED_CONTENT_TYPE = "Content-Type on actual not matching expected.%n Wanted: %s%n but found: %s";
 
     public static String validate(Response expectedResponse, HttpResponse actualResponse) {
-        if (expectedResponseHasBodyButMissingContentType(expectedResponse)) throw new AssertionError(EXPECTED_CONTENT_TYPE_MISSING);
-        if(actualResponseMissingContentType(actualResponse) && !expectedResponseMissingContentType(expectedResponse)) throw new AssertionError(ACTUAL_CONTENT_TYPE_MISSING);
-        if (expectedResponseMissingContentType(expectedResponse)) return "";
+        MediaType contentType = expectedResponse.getHeaders().getContentType();
+        if ((!expectedResponse.getBody().isEmpty() && expectedResponse.getHeaders().getContentType() == null)) throw new AssertionError(EXPECTED_CONTENT_TYPE_MISSING);
+        if(actualResponse.getEntity().getContentType() == null && expectedResponse.getHeaders().getContentType() != null) throw new AssertionError(ACTUAL_CONTENT_TYPE_MISSING);
+        if (Objects.isNull(contentType)) return "";
 
-        String expectedContentType = expectedResponse.getContentType().toString();
+        String expectedContentType = contentType.toString();
         String actualContentType = actualResponse.getEntity().getContentType().getValue();
         if(!actualContentType.equals(expectedContentType)) throw new AssertionError(String.format(MISMATCHED_CONTENT_TYPE, expectedContentType, actualContentType));
-        return expectedResponse.getContentType().toString();
+        return expectedContentType;
     }
 
-    private static boolean expectedResponseHasBodyButMissingContentType(Response expectedResponse) {
-        return (!expectedResponse.getBody().isEmpty() && expectedResponseMissingContentType(expectedResponse));
-    }
-
-    private static boolean expectedResponseMissingContentType(Response expectedResponse) {
-        return expectedResponse.getContentType() == null;
-    }
-
-    private static boolean actualResponseMissingContentType(HttpResponse actualResponse) {
-        return actualResponse.getEntity().getContentType() == null;
-    }
 }

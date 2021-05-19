@@ -23,7 +23,6 @@ import org.junit.rules.ExpectedException;
 import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.springframework.http.HttpStatus.*;
 
 public class ResponseTest {
@@ -77,7 +76,7 @@ public class ResponseTest {
     @Test
     public void canParseContentType() {
         final Response response = new Response(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
-        assertThat(response.getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
     }
 
     @Test
@@ -91,7 +90,7 @@ public class ResponseTest {
         final Response response = new Response("200 OK" + "\n");
 
         assertThat(response.getBody()).isEqualTo("");
-        assertThat(response.getContentType()).isNull();
+        assertThat(response.getHeaders().getContentType()).isNull();
     }
 
     @Test
@@ -105,9 +104,7 @@ public class ResponseTest {
                 "Hi." + "\n";
         final Response response = new Response(string);
 
-        assertThat(response.getHeaders().containsKey("Some-Header")).isTrue();
         assertThat(response.getHeaders().get("Some-Header")).containsExactly("Expected Value");
-        assertThat(response.getHeaders().containsKey("Another-Thing")).isTrue();
         assertThat(response.getHeaders().get("Another-Thing")).containsExactly("1st-value", "2nd-value with space");
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
     }
