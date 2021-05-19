@@ -21,7 +21,6 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.text.MessageFormat;
 import java.util.InputMismatchException;
@@ -38,31 +37,35 @@ public class Response {
 
     public Response(String textRepresentation) {
         try(Scanner scanner = new Scanner(textRepresentation)) {
-            String responseLine = scanner.nextLine();
-            this.statusCode = readStatusCode(responseLine);
-            checkCodeAndPhraseCompatibility(this.statusCode, readReasonPhrase(responseLine));
+            this.statusCode = readStatusLine(scanner.nextLine());
             this.headers = readHeaders(textRepresentation);
             this.body = readBody(textRepresentation);
         }
     }
 
-    private static HttpStatus readStatusCode(final String responseLine) {
-        String responseCode = responseLine.substring(0, responseLine.indexOf(' '));
+    private static HttpStatus readStatusLine(final String responseLine) {
+        String[] splitResponseLine = responseLine.stripTrailing().split(" ", 2);
+        HttpStatus responseCode = validateResponseCode(splitResponseLine[0]);
+        String reasonPhrase = validateReasonPhrase(splitResponseLine[1]);
+        checkCodeAndPhraseCompatibility(responseCode, reasonPhrase);
+        return responseCode;
+    }
+
+    private static HttpStatus validateResponseCode(String responseCodeString) {
         try {
-            return HttpStatus.valueOf(Integer.parseInt(responseCode));
+            return HttpStatus.valueOf(Integer.parseInt(responseCodeString));
         } catch (Exception e) {
-            throw new InvalidResponseException(String.format("'%s' is not a valid Status Code", responseCode));
+            throw new InvalidResponseException(String.format("'%s' is not a valid Status Code", responseCodeString));
         }
     }
 
-    private static String readReasonPhrase(final String responseLine) {
-        String reasonPhrase = responseLine.stripTrailing().substring(responseLine.indexOf(' ') + 1);
+    private static String validateReasonPhrase(final String reasonPhraseString) {
         try {
-            String enumeratedReasonPhrase = reasonPhrase.replaceAll(" ", "_").toUpperCase();
+            String enumeratedReasonPhrase = reasonPhraseString.replaceAll(" ", "_").toUpperCase();
             HttpStatus.valueOf(enumeratedReasonPhrase);
-            return reasonPhrase;
+            return reasonPhraseString;
         } catch (Exception e) {
-            throw new InvalidResponseException(String.format("'%s' is not a valid Reason Phrase", reasonPhrase));
+            throw new InvalidResponseException(String.format("'%s' is not a valid Reason Phrase", reasonPhraseString));
         }
     }
 
