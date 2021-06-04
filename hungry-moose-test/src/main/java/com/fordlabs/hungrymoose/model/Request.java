@@ -19,13 +19,12 @@ package com.fordlabs.hungrymoose.model;
 
 import com.fordlabs.hungrymoose.parser.BodyParser;
 import com.fordlabs.hungrymoose.parser.HeaderParser;
+import com.fordlabs.hungrymoose.parser.RequestLineParser;
 import lombok.Getter;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.springframework.http.HttpHeaders;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Scanner;
@@ -39,12 +38,7 @@ public class Request {
 
     public Request(final String textRepresentation) {
         try(Scanner scanner = new Scanner(textRepresentation)) {
-            String requestLine = scanner.nextLine();
-            String[] splitRequestLine = requestLine.split(" ");
-            if(splitRequestLine.length != 2) {
-                throw new InvalidRequestException("Request line has too many values. Should contain only the HTTP Method and request URI");
-            }
-            this.requestLine = new RequestLine(parseHttpMethod(splitRequestLine[0]), parseUri(splitRequestLine[1]));
+            this.requestLine = RequestLineParser.parse(scanner.nextLine());
             this.headers = HeaderParser.parse(scanner);
             this.body = BodyParser.parse(scanner);
         }
@@ -52,21 +46,5 @@ public class Request {
 
     public List<NameValuePair> getQueryParams(){
         return URLEncodedUtils.parse(this.requestLine.getUri(), Charset.defaultCharset());
-    }
-
-    private static HttpMethod parseHttpMethod(String method) {
-        try {
-            return HttpMethod.valueOf(method);
-        } catch(IllegalArgumentException e) {
-            throw new InvalidRequestException(String.format("'%s' is not a valid HTTP method", method));
-        }
-    }
-
-    private static URI parseUri(String uri) {
-        try {
-            return new URI(uri);
-        } catch (URISyntaxException e) {
-            throw new InvalidRequestException("URL has an invalid format");
-        }
     }
 }
