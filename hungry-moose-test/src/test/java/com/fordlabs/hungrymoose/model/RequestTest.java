@@ -42,8 +42,8 @@ public class RequestTest {
         final String requestLine = "GET /someurl\n";
         Request actualRequest = new Request(requestLine);
 
-        assertThat(actualRequest.getMethod()).isEqualTo(GET);
-        assertThat(actualRequest.getUri()).isEqualTo(new URI("/someurl"));
+        assertThat(actualRequest.getRequestLine().getMethod()).isEqualTo(GET);
+        assertThat(actualRequest.getRequestLine().getUri()).isEqualTo(new URI("/someurl"));
     }
 
     @Test

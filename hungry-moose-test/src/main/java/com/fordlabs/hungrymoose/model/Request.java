@@ -33,10 +33,7 @@ import java.util.Scanner;
 @Getter
 public class Request {
 
-    private final String textRepresentation;
-    private final HttpMethod method;
-    private final URI uri;
-    private final List<NameValuePair> queryParams;
+    private final RequestLine requestLine;
     private final HttpHeaders headers;
     private final String body;
 
@@ -47,13 +44,14 @@ public class Request {
             if(splitRequestLine.length != 2) {
                 throw new InvalidRequestException("Request line has too many values. Should contain only the HTTP Method and request URI");
             }
-            this.textRepresentation = textRepresentation;
-            this.method = parseHttpMethod(splitRequestLine[0]);
-            this.uri = parseUri(splitRequestLine[1]);
-            this.queryParams = URLEncodedUtils.parse(this.uri, Charset.defaultCharset());
+            this.requestLine = new RequestLine(parseHttpMethod(splitRequestLine[0]), parseUri(splitRequestLine[1]));
             this.headers = HeaderParser.parse(scanner);
             this.body = BodyParser.parse(scanner);
         }
+    }
+
+    public List<NameValuePair> getQueryParams(){
+        return URLEncodedUtils.parse(this.requestLine.getUri(), Charset.defaultCharset());
     }
 
     private static HttpMethod parseHttpMethod(String method) {

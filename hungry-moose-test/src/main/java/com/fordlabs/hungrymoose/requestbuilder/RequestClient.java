@@ -49,9 +49,9 @@ public class RequestClient {
     }
 
     private static HttpRequestBase createRequest(final UriUnderTest serverUnderTest, final Request request) throws Exception {
-        final HttpRequestBuilder httpRequestBuilder = httpRequestBuilders.get(request.getMethod());
+        final HttpRequestBuilder httpRequestBuilder = httpRequestBuilders.get(request.getRequestLine().getMethod());
         if (httpRequestBuilder == null) {
-            throw new RuntimeException("Unsupported HTTP request method: " + request.getMethod());
+            throw new RuntimeException("Unsupported HTTP request method: " + request.getRequestLine().getMethod());
         }
         return httpRequestBuilder.buildHttpRequest(serverUnderTest, request);
     }
