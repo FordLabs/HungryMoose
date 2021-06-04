@@ -121,7 +121,7 @@ public class ResponseTest {
     @Test
     public void parse_withMalformedHeader_ThrowsInvalidResponseException() {
         String requestWithHeaders = "200 OK\nContent-Type((( application/json\n";
-        expectedException.expect(InvalidResponseException.class);
+        expectedException.expect(InvalidHeaderException.class);
         expectedException.expectMessage("Cannot parse header: Content-Type((( application/json");
 
         new Response(requestWithHeaders);

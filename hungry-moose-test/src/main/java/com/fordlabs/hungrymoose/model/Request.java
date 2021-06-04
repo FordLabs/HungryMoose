@@ -17,6 +17,7 @@
 
 package com.fordlabs.hungrymoose.model;
 
+import com.fordlabs.hungrymoose.parser.HeaderParser;
 import lombok.Getter;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -49,7 +50,7 @@ public class Request {
             this.method = parseHttpMethod(splitRequestLine[0]);
             this.uri = parseUri(splitRequestLine[1]);
             this.queryParams = URLEncodedUtils.parse(this.uri, Charset.defaultCharset());
-            this.headers = parseHeaders(scanner);
+            this.headers = HeaderParser.parse(scanner);
             this.body = parseBody(scanner);
         }
     }
@@ -67,31 +68,6 @@ public class Request {
             return new URI(uri);
         } catch (URISyntaxException e) {
             throw new InvalidRequestException("URL has an invalid format");
-        }
-    }
-
-    private static HttpHeaders parseHeaders(Scanner scanner) {
-        HttpHeaders headers = new HttpHeaders();
-        while(scanner.hasNextLine()) {
-            String headerLine = scanner.nextLine();
-            if(headerLine.isBlank()) {
-                break;
-            }
-            else {
-                Header header = parseHeader(headerLine);
-                headers.add(header.getName(), header.getValue());
-            }
-        }
-
-        return headers;
-    }
-
-    private static Header parseHeader(String headerLine) {
-        try {
-            String[] headerParts = headerLine.split(":");
-            return new Header(headerParts[0].trim(), headerParts[1].trim());
-        } catch (Exception e) {
-            throw new InvalidRequestException("Cannot parse header: " + headerLine);
         }
     }
 

@@ -17,6 +17,7 @@
 
 package com.fordlabs.hungrymoose.model;
 
+import com.fordlabs.hungrymoose.parser.HeaderParser;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
@@ -38,7 +39,7 @@ public class Response {
     public Response(String textRepresentation) {
         try(Scanner scanner = new Scanner(textRepresentation)) {
             this.statusCode = readStatusLine(scanner.nextLine());
-            this.headers = parseHeaders(scanner);
+            this.headers = HeaderParser.parse(scanner);
             this.body = parseBody(scanner);
         }
     }
@@ -72,32 +73,6 @@ public class Response {
     private static void checkCodeAndPhraseCompatibility(HttpStatus statusCode, String reasonPhrase) {
         if (!statusCode.getReasonPhrase().equals(reasonPhrase)) {
             throw new InvalidResponseException("Status Code and Reason Phrase do not match");
-        }
-    }
-
-    private static HttpHeaders parseHeaders(Scanner scanner) {
-        HttpHeaders headers = new HttpHeaders();
-
-        while(scanner.hasNextLine()) {
-            String headerLine = scanner.nextLine();
-            if(headerLine.isBlank()) {
-                break;
-            }
-            else {
-                Header header = parseHeader(headerLine);
-                headers.add(header.getName(), header.getValue());
-            }
-        }
-
-        return headers;
-    }
-
-    private static Header parseHeader(String headerLine) {
-        try {
-            String[] headerParts = headerLine.split(":");
-            return new Header(headerParts[0].trim(), headerParts[1].trim());
-        } catch (Exception e) {
-            throw new InvalidResponseException("Cannot parse header: " + headerLine);
         }
     }
 
