@@ -19,13 +19,13 @@
 
 package com.fordlabs.hungrymoose.model;
 
-class InvalidResponseException extends RuntimeException {
+public class InvalidResponseException extends RuntimeException {
 
-    InvalidResponseException(String message) {
+    public InvalidResponseException(String message) {
         super(message);
     }
 
-    InvalidResponseException(String message, Throwable throwable) {
+    public InvalidResponseException(String message, Throwable throwable) {
         super(message, throwable);
     }
 

@@ -19,16 +19,12 @@ package com.fordlabs.hungrymoose.model;
 
 import com.fordlabs.hungrymoose.parser.BodyParser;
 import com.fordlabs.hungrymoose.parser.HeaderParser;
+import com.fordlabs.hungrymoose.parser.StatusLineParser;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
-import java.text.MessageFormat;
-import java.util.InputMismatchException;
 import java.util.Scanner;
-import java.util.regex.MatchResult;
-import java.util.regex.Pattern;
 
 @Getter
 public class Response {
@@ -39,41 +35,9 @@ public class Response {
 
     public Response(String textRepresentation) {
         try(Scanner scanner = new Scanner(textRepresentation)) {
-            this.statusCode = readStatusLine(scanner.nextLine());
+            this.statusCode = StatusLineParser.parse(scanner.nextLine());
             this.headers = HeaderParser.parse(scanner);
             this.body = BodyParser.parse(scanner);
-        }
-    }
-
-    private static HttpStatus readStatusLine(final String responseLine) {
-        String[] splitResponseLine = responseLine.stripTrailing().split(" ", 2);
-        HttpStatus responseCode = validateResponseCode(splitResponseLine[0]);
-        String reasonPhrase = validateReasonPhrase(splitResponseLine[1]);
-        checkCodeAndPhraseCompatibility(responseCode, reasonPhrase);
-        return responseCode;
-    }
-
-    private static HttpStatus validateResponseCode(String responseCodeString) {
-        try {
-            return HttpStatus.valueOf(Integer.parseInt(responseCodeString));
-        } catch (Exception e) {
-            throw new InvalidResponseException(String.format("'%s' is not a valid Status Code", responseCodeString));
-        }
-    }
-
-    private static String validateReasonPhrase(final String reasonPhraseString) {
-        try {
-            String enumeratedReasonPhrase = reasonPhraseString.replaceAll(" ", "_").toUpperCase();
-            HttpStatus.valueOf(enumeratedReasonPhrase);
-            return reasonPhraseString;
-        } catch (Exception e) {
-            throw new InvalidResponseException(String.format("'%s' is not a valid Reason Phrase", reasonPhraseString));
-        }
-    }
-
-    private static void checkCodeAndPhraseCompatibility(HttpStatus statusCode, String reasonPhrase) {
-        if (!statusCode.getReasonPhrase().equals(reasonPhrase)) {
-            throw new InvalidResponseException("Status Code and Reason Phrase do not match");
         }
     }
 }
