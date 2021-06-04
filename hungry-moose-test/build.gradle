@@ -10,7 +10,7 @@ apply plugin: 'io.spring.dependency-management'
 group 'com.fordlabs'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 12
+sourceCompatibility = 11
 
 repositories {
     mavenCentral()
