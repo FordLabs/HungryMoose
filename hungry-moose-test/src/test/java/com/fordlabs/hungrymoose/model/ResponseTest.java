@@ -167,8 +167,8 @@ public class ResponseTest {
 
     @Test
     public void parse_withBodyAndHeaders_ReturnsRequestWithBodyAndHeaders() {
-        String requestString = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\nBody\nContent\nExists\nHere";
-        Request request = new Request(requestString);
+        String requestString = "200 OK\nContent-Type: application/json\nAuthorization:value\n\nBody\nContent\nExists\nHere";
+        Response request = Response.from(requestString);
         assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
         assertThat(request.getBody()).isEqualTo("Body\nContent\nExists\nHere");

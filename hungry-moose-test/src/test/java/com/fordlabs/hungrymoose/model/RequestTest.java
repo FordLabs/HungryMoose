@@ -40,7 +40,7 @@ public class RequestTest {
     @Test
     public void parse_withValidRequestLine_ReturnsRequestWithUriAndMethod() throws URISyntaxException {
         final String requestLine = "GET /someurl\n";
-        Request actualRequest = new Request(requestLine);
+        Request actualRequest = Request.from(requestLine);
 
         assertThat(actualRequest.getRequestLine().getMethod()).isEqualTo(GET);
         assertThat(actualRequest.getRequestLine().getUri()).isEqualTo(new URI("/someurl"));
@@ -54,7 +54,7 @@ public class RequestTest {
                 new BasicNameValuePair("v2", "two")
             ) ;
 
-        Request actualRequest = new Request(requestLine);
+        Request actualRequest = Request.from(requestLine);
 
         assertThat(actualRequest.getQueryParams()).isEqualTo(expectedQueryParameters);
     }
@@ -66,7 +66,7 @@ public class RequestTest {
         expectedException.expect(InvalidRequestException.class);
         expectedException.expectMessage("'BOGUS' is not a valid HTTP method");
 
-        new Request(requestLine);
+        Request.from(requestLine);
     }
 
     @Test
@@ -76,7 +76,7 @@ public class RequestTest {
         expectedException.expect(InvalidRequestException.class);
         expectedException.expectMessage("Request line has too many values. Should contain only the HTTP Method and request URI");
 
-        new Request(requestLine);
+        Request.from(requestLine);
     }
 
     @Test
@@ -86,13 +86,13 @@ public class RequestTest {
         expectedException.expect(InvalidRequestException.class);
         expectedException.expectMessage("URL has an invalid format");
 
-        new Request(requestLine);
+        Request.from(requestLine);
     }
 
     @Test
     public void parse_withHeaders_ReturnsRequestWithHeaders() {
         String requestWithHeaders = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\n";
-        Request request = new Request(requestWithHeaders);
+        Request request = Request.from(requestWithHeaders);
         assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
     }
@@ -100,7 +100,7 @@ public class RequestTest {
     @Test
     public void parse_withoutBlankLineAfterHeaders_ReturnsRequestWithHeaders() {
         String requestWithHeaders = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n";
-        Request request = new Request(requestWithHeaders);
+        Request request = Request.from(requestWithHeaders);
         assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
     }
@@ -111,20 +111,20 @@ public class RequestTest {
         expectedException.expect(InvalidHeaderException.class);
         expectedException.expectMessage("Cannot parse header: Content-Type((( application/json");
 
-        new Request(requestWithHeaders);
+        Request.from(requestWithHeaders);
     }
 
     @Test
     public void parse_withBody_ReturnsRequestWithBody() {
         String requestString = "GET /someUrl\n\nBody\nContent\nExists\nHere\n\n";
-        Request request = new Request(requestString);
+        Request request = Request.from(requestString);
         assertThat(request.getBody()).isEqualTo("Body\nContent\nExists\nHere");
     }
 
     @Test
     public void parse_withBodyAndHeaders_ReturnsRequestWithBodyAndHeaders() {
         String requestString = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\nBody\nContent\nExists\nHere";
-        Request request = new Request(requestString);
+        Request request = Request.from(requestString);
         assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
         assertThat(request.getBody()).isEqualTo("Body\nContent\nExists\nHere");

@@ -17,6 +17,7 @@
 
 package com.fordlabs.hungrymoose.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fordlabs.hungrymoose.parser.BodyParser;
 import com.fordlabs.hungrymoose.parser.HeaderParser;
 import com.fordlabs.hungrymoose.parser.RequestLineParser;
@@ -36,12 +37,20 @@ public class Request {
     private final HttpHeaders headers;
     private final String body;
 
-    public Request(final String textRepresentation) {
+    @JsonCreator
+    public static Request from(final String textRepresentation) {
         try(Scanner scanner = new Scanner(textRepresentation)) {
-            this.requestLine = RequestLineParser.parse(scanner.nextLine());
-            this.headers = HeaderParser.parse(scanner);
-            this.body = BodyParser.parse(scanner);
+            var requestLine = RequestLineParser.parse(scanner.nextLine());
+            var headers = HeaderParser.parse(scanner);
+            var body = BodyParser.parse(scanner);
+            return new Request(requestLine, headers, body);
         }
+    }
+
+    private Request(RequestLine requestLine, HttpHeaders headers, String body) {
+        this.requestLine = requestLine;
+        this.headers = headers;
+        this.body = body;
     }
 
     public List<NameValuePair> getQueryParams(){
