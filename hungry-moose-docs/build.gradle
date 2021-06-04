@@ -10,7 +10,7 @@ plugins {
 
 apply plugin: 'io.spring.dependency-management'
 
-group 'fordlabs'
+group 'com.fordlabs'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 12
