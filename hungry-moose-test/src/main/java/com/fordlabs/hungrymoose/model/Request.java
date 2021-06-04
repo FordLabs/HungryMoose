@@ -17,6 +17,7 @@
 
 package com.fordlabs.hungrymoose.model;
 
+import com.fordlabs.hungrymoose.parser.BodyParser;
 import com.fordlabs.hungrymoose.parser.HeaderParser;
 import lombok.Getter;
 import org.apache.http.NameValuePair;
@@ -51,7 +52,7 @@ public class Request {
             this.uri = parseUri(splitRequestLine[1]);
             this.queryParams = URLEncodedUtils.parse(this.uri, Charset.defaultCharset());
             this.headers = HeaderParser.parse(scanner);
-            this.body = parseBody(scanner);
+            this.body = BodyParser.parse(scanner);
         }
     }
 
@@ -69,14 +70,5 @@ public class Request {
         } catch (URISyntaxException e) {
             throw new InvalidRequestException("URL has an invalid format");
         }
-    }
-
-    private static String parseBody(final Scanner scanner) {
-        StringBuilder bodyBuilder = new StringBuilder();
-        while(scanner.hasNextLine()) {
-            bodyBuilder.append(scanner.nextLine()).append("\n");
-        }
-
-        return bodyBuilder.toString().trim();
     }
 }

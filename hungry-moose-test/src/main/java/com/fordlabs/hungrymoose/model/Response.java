@@ -17,6 +17,7 @@
 
 package com.fordlabs.hungrymoose.model;
 
+import com.fordlabs.hungrymoose.parser.BodyParser;
 import com.fordlabs.hungrymoose.parser.HeaderParser;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +41,7 @@ public class Response {
         try(Scanner scanner = new Scanner(textRepresentation)) {
             this.statusCode = readStatusLine(scanner.nextLine());
             this.headers = HeaderParser.parse(scanner);
-            this.body = parseBody(scanner);
+            this.body = BodyParser.parse(scanner);
         }
     }
 
@@ -74,14 +75,5 @@ public class Response {
         if (!statusCode.getReasonPhrase().equals(reasonPhrase)) {
             throw new InvalidResponseException("Status Code and Reason Phrase do not match");
         }
-    }
-
-    private static String parseBody(final Scanner scanner) {
-        StringBuilder bodyBuilder = new StringBuilder();
-        while(scanner.hasNextLine()) {
-            bodyBuilder.append(scanner.nextLine()).append("\n");
-        }
-
-        return bodyBuilder.toString().trim();
     }
 }
