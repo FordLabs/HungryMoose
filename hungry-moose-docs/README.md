@@ -28,14 +28,13 @@ Add the following snippet to your `pom.xml` to include the project.
 <dependency>
   <groupId>com.fordlabs</groupId>
   <artifactId>hungry-moose-docs</artifactId>
-  <scope>test</scope>
 </dependency>
 ```
 
 Or if you're using Gradle.
 
 ```Gradle
-testImplementation 'com.fordlabs:hungry-moose-docs:1.0-SNAPSHOT'
+implementation 'com.fordlabs:hungry-moose-docs:1.0-SNAPSHOT'
 ```
 
 [Back to HungryMoose main page](https://github.com/FordLabs/HungryMoose)
