@@ -166,13 +166,22 @@ public class ResponseTest {
     }
 
     @Test
-    public void canParseJsonBody() {
+    public void parse_withBodyAndHeaders_ReturnsRequestWithBodyAndHeaders() {
+        String requestString = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\nBody\nContent\nExists\nHere";
+        Request request = new Request(requestString);
+        assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
+        assertThat(request.getBody()).isEqualTo("Body\nContent\nExists\nHere");
+    }
+
+    @Test
+    public void parse_withBody_ReturnsResponseWithBody() {
         final Response response = new Response(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
         assertThat(response.getBody()).isEqualTo(JSON_BODY);
     }
 
     @Test
-    public void canParseResponseWhereNoBodyIsExpected() {
+    public void parse_withNoBody_ReturnsResponseWithNoBody() {
         final Response response = new Response("200 OK" + "\n");
 
         assertThat(response.getBody()).isEqualTo("");

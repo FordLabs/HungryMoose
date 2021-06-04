@@ -39,7 +39,7 @@ public class Response {
         try(Scanner scanner = new Scanner(textRepresentation)) {
             this.statusCode = readStatusLine(scanner.nextLine());
             this.headers = parseHeaders(scanner);
-            this.body = readBody(textRepresentation);
+            this.body = parseBody(scanner);
         }
     }
 
@@ -101,12 +101,12 @@ public class Response {
         }
     }
 
-    private static String readBody(final String requestText) {
-        final String[] sections = splitTopAndBodySections(requestText);
-        return sections.length > 1 ? StringUtils.strip(sections[1], "\n") : "";
-    }
+    private static String parseBody(final Scanner scanner) {
+        StringBuilder bodyBuilder = new StringBuilder();
+        while(scanner.hasNextLine()) {
+            bodyBuilder.append(scanner.nextLine()).append("\n");
+        }
 
-    private static String[] splitTopAndBodySections(final String requestText) {
-        return requestText.split("\n\n", 2);
+        return bodyBuilder.toString().trim();
     }
 }

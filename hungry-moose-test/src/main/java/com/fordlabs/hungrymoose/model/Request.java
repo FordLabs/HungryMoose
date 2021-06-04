@@ -95,15 +95,10 @@ public class Request {
         }
     }
 
-    private static String parseBody(Scanner requestScanner) {
-        boolean parsingBody = true;
+    private static String parseBody(final Scanner scanner) {
         StringBuilder bodyBuilder = new StringBuilder();
-        while(parsingBody) {
-            if (requestScanner.hasNextLine()) {
-                bodyBuilder.append(requestScanner.nextLine()).append("\n");
-            } else {
-                parsingBody = false;
-            }
+        while(scanner.hasNextLine()) {
+            bodyBuilder.append(scanner.nextLine()).append("\n");
         }
 
         return bodyBuilder.toString().trim();
