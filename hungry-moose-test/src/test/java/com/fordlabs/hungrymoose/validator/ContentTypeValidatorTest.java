@@ -99,7 +99,7 @@ public class ContentTypeValidatorTest {
         String responseLine = "200 OK\n";
         String contentTypeHeader = contentType == null ? "\n\n" : String.format("Content-Type:%s%n%n", contentType);
 
-        return new Response(responseLine + contentTypeHeader + bodyContent);
+        return Response.from(responseLine + contentTypeHeader + bodyContent);
     }
 
     private HttpResponse createActualResponse(String contentType) {

@@ -17,6 +17,7 @@
 
 package com.fordlabs.hungrymoose.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fordlabs.hungrymoose.parser.BodyParser;
 import com.fordlabs.hungrymoose.parser.HeaderParser;
 import com.fordlabs.hungrymoose.parser.StatusLineParser;
@@ -33,11 +34,19 @@ public class Response {
     private final HttpHeaders headers;
     private final String body;
 
-    public Response(String textRepresentation) {
+    @JsonCreator
+    public static Response from(final String textRepresentation) {
         try(Scanner scanner = new Scanner(textRepresentation)) {
-            this.statusCode = StatusLineParser.parse(scanner.nextLine());
-            this.headers = HeaderParser.parse(scanner);
-            this.body = BodyParser.parse(scanner);
+            var statusCode = StatusLineParser.parse(scanner.nextLine());
+            var headers = HeaderParser.parse(scanner);
+            var body = BodyParser.parse(scanner);
+            return new Response(statusCode, headers, body);
         }
+    }
+
+    private Response(HttpStatus statusCode, HttpHeaders headers, String body) {
+        this.statusCode = statusCode;
+        this.headers = headers;
+        this.body = body;
     }
 }

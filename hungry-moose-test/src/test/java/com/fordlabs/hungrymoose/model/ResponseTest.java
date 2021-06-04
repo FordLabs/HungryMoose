@@ -37,7 +37,7 @@ public class ResponseTest {
     @Test
     public void parse_withValidResponseLine_ReturnsRequestWithStatusCode() {
         final String responseLine = "400 Bad Request\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY;
-        Response actualResponse = new Response(responseLine);
+        Response actualResponse = Response.from(responseLine);
 
         assertThat(actualResponse.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
@@ -45,7 +45,7 @@ public class ResponseTest {
     @Test
     public void parse_withPhraseWithTrailingSpaces_StillResolves() {
         final String responseLine = "400 Bad Request      \n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY;
-        Response actualResponse = new Response(responseLine);
+        Response actualResponse = Response.from(responseLine);
 
         assertThat(actualResponse.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
@@ -57,7 +57,7 @@ public class ResponseTest {
         expectedException.expect(InvalidResponseException.class);
         expectedException.expectMessage("'9800' is not a valid Status Code");
 
-        new Response(responseLine);
+        Response.from(responseLine);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ResponseTest {
         expectedException.expect(InvalidResponseException.class);
         expectedException.expectMessage("'something dumb' is not a valid Reason Phrase");
 
-        new Response(responseLine);
+        Response.from(responseLine);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class ResponseTest {
         expectedException.expect(InvalidResponseException.class);
         expectedException.expectMessage("Status Code and Reason Phrase do not match");
 
-        new Response(responseLine);
+        Response.from(responseLine);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class ResponseTest {
                 "Content-Type: text/plain" + "\n" +
                 "\n" +
                 "Hi." + "\n";
-        final Response response = new Response(string);
+        final Response response = Response.from(string);
 
         assertThat(response.getHeaders().get("Some-Header")).containsExactly("Expected Value");
         assertThat(response.getHeaders().get("Another-Thing")).containsExactly("1st-value", "2nd-value with space");
@@ -98,14 +98,14 @@ public class ResponseTest {
 
     @Test
     public void parse_withHeaders_CanParseContentType() {
-        final Response response = new Response(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
+        final Response response = Response.from(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
     }
 
     @Test
     public void parse_withHeaders_ReturnsResponseWithHeaders() {
         String requestWithHeaders = "200 OK\nContent-Type: application/json\nAuthorization:value\n\n";
-        Response request = new Response(requestWithHeaders);
+        Response request = Response.from(requestWithHeaders);
         assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
     }
@@ -113,7 +113,7 @@ public class ResponseTest {
     @Test
     public void parse_withoutBlankLineAfterHeaders_ReturnsResponseWithHeaders() {
         String requestWithHeaders = "200 OK\nContent-Type: application/json\nAuthorization:value\n";
-        Response request = new Response(requestWithHeaders);
+        Response request = Response.from(requestWithHeaders);
         assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
         assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
     }
@@ -124,7 +124,7 @@ public class ResponseTest {
         expectedException.expect(InvalidHeaderException.class);
         expectedException.expectMessage("Cannot parse header: Content-Type((( application/json");
 
-        new Response(requestWithHeaders);
+        Response.from(requestWithHeaders);
     }
 
     @Test
@@ -134,7 +134,7 @@ public class ResponseTest {
                 "Another-Thing: 1st-value" + "\n" +
                 "\n" +
                 "Hello everybody.";
-        final Response response = new Response(string);
+        final Response response = Response.from(string);
 
         assertThat(response.getBody()).isEqualTo("Hello everybody.");
     }
@@ -146,7 +146,7 @@ public class ResponseTest {
                 "\n" +
                 "The end of the line." +
                 "\n";
-        final Response response = new Response(string);
+        final Response response = Response.from(string);
 
         assertThat(response.getBody()).isEqualTo("The end of the line.");
     }
@@ -160,7 +160,7 @@ public class ResponseTest {
                 "\n" +
                 "\n" +
                 "...it was the worst of times";
-        final Response response = new Response(string);
+        final Response response = Response.from(string);
 
         assertThat(response.getBody()).isEqualTo("It was the best of times...\n\n...it was the worst of times");
     }
@@ -176,13 +176,13 @@ public class ResponseTest {
 
     @Test
     public void parse_withBody_ReturnsResponseWithBody() {
-        final Response response = new Response(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
+        final Response response = Response.from(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
         assertThat(response.getBody()).isEqualTo(JSON_BODY);
     }
 
     @Test
     public void parse_withNoBody_ReturnsResponseWithNoBody() {
-        final Response response = new Response("200 OK" + "\n");
+        final Response response = Response.from("200 OK" + "\n");
 
         assertThat(response.getBody()).isEqualTo("");
         assertThat(response.getHeaders().getContentType()).isNull();

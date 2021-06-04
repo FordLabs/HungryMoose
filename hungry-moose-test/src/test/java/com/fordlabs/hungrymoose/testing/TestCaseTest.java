@@ -71,7 +71,7 @@ public class TestCaseTest {
     public void continuesOnIfThereIsNoExpectedBody() {
         String expectedBody = "";
 
-        Response expectedResponse = new Response("200 OK\n" + "Content-Type: application/json" + "\n\n" + expectedBody);
+        Response expectedResponse = Response.from("200 OK\n" + "Content-Type: application/json" + "\n\n" + expectedBody);
         TestCase testCase = new TestCase(null, expectedResponse, null);
 
         testCase.assertResponseBody(ACTUAL_BODY, JSON);
@@ -138,6 +138,6 @@ public class TestCaseTest {
     }
 
     private static Response buildResponse(String mediaType, String body) {
-        return new Response("200 OK\n" + mediaType + "\n\n" + body);
+        return Response.from("200 OK\n" + mediaType + "\n\n" + body);
     }
 }
