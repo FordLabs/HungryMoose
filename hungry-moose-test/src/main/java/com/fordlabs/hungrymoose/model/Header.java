@@ -17,9 +17,9 @@
 
 package com.fordlabs.hungrymoose.model;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import lombok.Data;
 
+@Data
 public class Header {
     private String name;
     private String value;
@@ -28,23 +28,4 @@ public class Header {
         this.name = name;
         this.value = value;
     }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public String getValue() {
-        return this.value;
-    }
-
-    @Override
-    public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj);
-    }
-
 }

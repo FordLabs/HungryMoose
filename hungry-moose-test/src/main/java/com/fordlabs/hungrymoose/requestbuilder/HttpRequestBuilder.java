@@ -17,11 +17,11 @@
 
 package com.fordlabs.hungrymoose.requestbuilder;
 
-import com.fordlabs.hungrymoose.model.Header;
 import com.fordlabs.hungrymoose.model.Request;
 import com.fordlabs.hungrymoose.testing.UriUnderTest;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -55,9 +55,11 @@ public abstract class HttpRequestBuilder {
         }
     }
 
-    private void setHeaders(final HttpRequestBase httpRequest, final List<Header> headers) {
-        for (final Header header : headers) {
-            httpRequest.setHeader(header.getName(), header.getValue());
+    private void setHeaders(final HttpRequestBase httpRequest, final HttpHeaders headers) {
+        for (var entry : headers.entrySet()) {
+            for (String value : entry.getValue()) {
+                httpRequest.setHeader(entry.getKey(), value);
+            }
         }
     }
 }

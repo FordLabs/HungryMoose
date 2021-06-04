@@ -38,7 +38,7 @@ public class Response {
     public Response(String textRepresentation) {
         try(Scanner scanner = new Scanner(textRepresentation)) {
             this.statusCode = readStatusLine(scanner.nextLine());
-            this.headers = readHeaders(textRepresentation);
+            this.headers = parseHeaders(scanner);
             this.body = readBody(textRepresentation);
         }
     }
@@ -75,37 +75,35 @@ public class Response {
         }
     }
 
-    private static HttpHeaders readHeaders(final String requestText) {
-        final String topSection = splitTopAndBodySections(requestText)[0];
-        final Scanner scanner = new Scanner(topSection).useDelimiter("\n");
-        skipStatusLine(scanner);
+    private static HttpHeaders parseHeaders(Scanner scanner) {
+        HttpHeaders headers = new HttpHeaders();
 
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        final Pattern headerPattern = Pattern.compile("(.+):(.+)");
-        while (scanner.hasNext()) {
-            try {
-                scanner.next(headerPattern);
-            } catch (final InputMismatchException e) {
-                final String message = MessageFormat.format("Invalid HTTP header: \"{0}\". Expected a key:value pair", scanner.next());
-                throw new InvalidResponseException(message, e);
+        while(scanner.hasNextLine()) {
+            String headerLine = scanner.nextLine();
+            if(headerLine.isBlank()) {
+                break;
             }
-            final MatchResult match = scanner.match();
-            final String key = match.group(1).trim();
-            final String value = match.group(2).trim();
-            httpHeaders.add(key, value);
+            else {
+                Header header = parseHeader(headerLine);
+                headers.add(header.getName(), header.getValue());
+            }
         }
-        scanner.close();
 
-        return httpHeaders;
+        return headers;
+    }
+
+    private static Header parseHeader(String headerLine) {
+        try {
+            String[] headerParts = headerLine.split(":");
+            return new Header(headerParts[0].trim(), headerParts[1].trim());
+        } catch (Exception e) {
+            throw new InvalidResponseException("Cannot parse header: " + headerLine);
+        }
     }
 
     private static String readBody(final String requestText) {
         final String[] sections = splitTopAndBodySections(requestText);
         return sections.length > 1 ? StringUtils.strip(sections[1], "\n") : "";
-    }
-
-    private static void skipStatusLine(final Scanner scanner) {
-        scanner.nextLine();
     }
 
     private static String[] splitTopAndBodySections(final String requestText) {

@@ -81,27 +81,7 @@ public class ResponseTest {
     }
 
     @Test
-    public void canParseContentType() {
-        final Response response = new Response(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
-        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
-    }
-
-    @Test
-    public void canParseJsonBody() {
-        final Response response = new Response(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
-        assertThat(response.getBody()).isEqualTo(JSON_BODY);
-    }
-
-    @Test
-    public void canParseResponseWhereNoBodyIsExpected() {
-        final Response response = new Response("200 OK" + "\n");
-
-        assertThat(response.getBody()).isEqualTo("");
-        assertThat(response.getHeaders().getContentType()).isNull();
-    }
-
-    @Test
-    public void canParseHeaders() {
+    public void parse_withHeaders_CanReturnHeaders() {
         final String string = "200 OK" + "\n" +
                 "Some-Header: Expected Value" + "\n" +
                 "Another-Thing: 1st-value" + "\n" +
@@ -114,6 +94,37 @@ public class ResponseTest {
         assertThat(response.getHeaders().get("Some-Header")).containsExactly("Expected Value");
         assertThat(response.getHeaders().get("Another-Thing")).containsExactly("1st-value", "2nd-value with space");
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
+    }
+
+    @Test
+    public void parse_withHeaders_CanParseContentType() {
+        final Response response = new Response(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
+        assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+    }
+
+    @Test
+    public void parse_withHeaders_ReturnsResponseWithHeaders() {
+        String requestWithHeaders = "200 OK\nContent-Type: application/json\nAuthorization:value\n\n";
+        Response request = new Response(requestWithHeaders);
+        assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
+    }
+
+    @Test
+    public void parse_withoutBlankLineAfterHeaders_ReturnsResponseWithHeaders() {
+        String requestWithHeaders = "200 OK\nContent-Type: application/json\nAuthorization:value\n";
+        Response request = new Response(requestWithHeaders);
+        assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
+    }
+
+    @Test
+    public void parse_withMalformedHeader_ThrowsInvalidResponseException() {
+        String requestWithHeaders = "200 OK\nContent-Type((( application/json\n";
+        expectedException.expect(InvalidResponseException.class);
+        expectedException.expectMessage("Cannot parse header: Content-Type((( application/json");
+
+        new Response(requestWithHeaders);
     }
 
     @Test
@@ -155,17 +166,16 @@ public class ResponseTest {
     }
 
     @Test
-    public void throwsAnErrorIfHeadersAreMalformed() {
-        final String string = "200 OK" + "\n" +
-                "Content-Type: application/json" + "\n" +
-                "bogus-bogus" + "\n" +
-                "\n" +
-                "Body goes here" +
-                "\n";
+    public void canParseJsonBody() {
+        final Response response = new Response(HEADER + "\n" + CONTENT_TYPE_JSON + "\n\n" + JSON_BODY);
+        assertThat(response.getBody()).isEqualTo(JSON_BODY);
+    }
 
-        expectedException.expect(InvalidResponseException.class);
-        expectedException.expectMessage("Invalid HTTP header: \"bogus-bogus\". " + "Expected a key:value pair");
+    @Test
+    public void canParseResponseWhereNoBodyIsExpected() {
+        final Response response = new Response("200 OK" + "\n");
 
-        new Response(string);
+        assertThat(response.getBody()).isEqualTo("");
+        assertThat(response.getHeaders().getContentType()).isNull();
     }
 }

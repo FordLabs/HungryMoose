@@ -22,6 +22,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.http.MediaType;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -91,19 +92,17 @@ public class RequestTest {
     @Test
     public void parse_withHeaders_ReturnsRequestWithHeaders() {
         String requestWithHeaders = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\n";
-        Header expectedContentType = new Header("Content-Type", "application/json");
-        Header expectedAuthorization = new Header("Authorization", "value");
         Request request = new Request(requestWithHeaders);
-        assertThat(request.getHeaders()).containsExactlyInAnyOrder(expectedContentType, expectedAuthorization);
+        assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
     }
 
     @Test
     public void parse_withoutBlankLineAfterHeaders_ReturnsRequestWithHeaders() {
         String requestWithHeaders = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n";
-        Header expectedContentType = new Header("Content-Type", "application/json");
-        Header expectedAuthorization = new Header("Authorization", "value");
         Request request = new Request(requestWithHeaders);
-        assertThat(request.getHeaders()).containsExactlyInAnyOrder(expectedContentType, expectedAuthorization);
+        assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
     }
 
     @Test
@@ -125,10 +124,9 @@ public class RequestTest {
     @Test
     public void parse_withBodyAndHeaders_ReturnsRequestWithBodyAndHeaders() {
         String requestString = "GET /someUrl\nContent-Type: application/json\nAuthorization:value\n\nBody\nContent\nExists\nHere";
-        Header expectedContentType = new Header("Content-Type", "application/json");
-        Header expectedAuthorization = new Header("Authorization", "value");
         Request request = new Request(requestString);
-        assertThat(request.getHeaders()).containsExactlyInAnyOrder(expectedContentType, expectedAuthorization);
+        assertThat(request.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(request.getHeaders().get("Authorization")).containsExactly("value");
         assertThat(request.getBody()).isEqualTo("Body\nContent\nExists\nHere");
     }
 }

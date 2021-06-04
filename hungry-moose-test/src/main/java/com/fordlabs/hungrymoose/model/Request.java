@@ -20,11 +20,11 @@ package com.fordlabs.hungrymoose.model;
 import lombok.Getter;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.springframework.http.HttpHeaders;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -35,7 +35,7 @@ public class Request {
     private final HttpMethod method;
     private final URI uri;
     private final List<NameValuePair> queryParams;
-    private final List<Header> headers;
+    private final HttpHeaders headers;
     private final String body;
 
     public Request(final String textRepresentation) {
@@ -70,20 +70,16 @@ public class Request {
         }
     }
 
-    private static List<Header> parseHeaders(Scanner requestScanner) {
-        boolean parsingHeaders = true;
-        List<Header> headers = new ArrayList<>();
-        while(parsingHeaders) {
-            if(requestScanner.hasNextLine()) {
-                String headerLine = requestScanner.nextLine();
-                if(headerLine.isBlank()) {
-                    parsingHeaders = false;
-                }
-                else {
-                    headers.add(parseHeader(headerLine));
-                }
-            } else {
-                parsingHeaders = false;
+    private static HttpHeaders parseHeaders(Scanner scanner) {
+        HttpHeaders headers = new HttpHeaders();
+        while(scanner.hasNextLine()) {
+            String headerLine = scanner.nextLine();
+            if(headerLine.isBlank()) {
+                break;
+            }
+            else {
+                Header header = parseHeader(headerLine);
+                headers.add(header.getName(), header.getValue());
             }
         }
 
