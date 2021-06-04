@@ -26,7 +26,7 @@ Add the following snippet to your `pom.xml` to include the project.
 
 ```Maven POM
 <dependency>
-  <groupId>fordlabs</groupId>
+  <groupId>com.fordlabs</groupId>
   <artifactId>hungry-moose-docs</artifactId>
   <scope>test</scope>
 </dependency>
@@ -35,7 +35,7 @@ Add the following snippet to your `pom.xml` to include the project.
 Or if you're using Gradle.
 
 ```Gradle
-testImplementation 'fordlabs:hungry-moose-docs:1.0-SNAPSHOT'
+testImplementation 'com.fordlabs:hungry-moose-docs:1.0-SNAPSHOT'
 ```
 
 [Back to HungryMoose main page](https://github.com/FordLabs/HungryMoose)
