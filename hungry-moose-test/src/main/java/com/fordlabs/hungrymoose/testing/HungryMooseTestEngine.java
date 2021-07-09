@@ -17,9 +17,11 @@
  *
  */
 
-package com.fordlabs.fordlabs.hungrymoose.acceptance;
+package com.fordlabs.hungrymoose.testing;
 
 import org.junit.platform.engine.*;
+import org.junit.platform.engine.discovery.ClassSelector;
+import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 public class HungryMooseTestEngine implements TestEngine {
     @Override
@@ -30,7 +32,8 @@ public class HungryMooseTestEngine implements TestEngine {
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
         System.out.println("I guess you've DISCOVERED that I don't care what you found");
-        return null;
+        discoveryRequest.getSelectorsByType(ClassSelector.class).forEach((selector) -> System.out.println(selector.getClassName()));
+        return new HungryMooseTestEngineDescriptor(uniqueId);
     }
 
     @Override
