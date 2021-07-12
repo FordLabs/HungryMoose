@@ -18,13 +18,13 @@
 package com.fordlabs.fordlabs.hungrymoose.acceptance;
 
 import com.fordlabs.hungrymoose.testing.ApplicationToTest;
-import com.fordlabs.hungrymoose.testing.HungryMooseTestRunner;
+import com.fordlabs.hungrymoose.testing.HungryMooseJUnit4TestRunner;
 import com.fordlabs.hungrymoose.testing.SpecsFromResourcePath;
 import org.junit.runner.RunWith;
 
-@RunWith(HungryMooseTestRunner.class)
+@RunWith(HungryMooseJUnit4TestRunner.class)
 @ApplicationToTest(RapidStubApplication.class)
 @SpecsFromResourcePath("api/hungrymoose/spec.yaml")
-public class HungryMooseAcceptanceTest {
+public class HungryMooseJUnit4AcceptanceTest {
     // executed by HungryMooseTestRunner
 }

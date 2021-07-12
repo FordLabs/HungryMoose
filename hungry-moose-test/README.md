@@ -17,12 +17,40 @@ An example file structure could look like this:
 
 The following is an example of what a HungryMoose Test file looks like.
 
+Using JUnit4's @RunWith:
 ```Java
-@RunWith(HungryMooseTestRunner.class)
+@RunWith(HungryMooseJUnit4TestRunner.class)
 @ApplicationToTest(HungrymoosedemoApplication.class)
 @SpecsFromResourcePath("api/spec.yaml")
 class HungrymoosedemoApplicationTests {
 	// executed by HungryMooseTestRunner
+}
+```
+
+Using JUnit5's parameterized tests:
+
+```Java
+@ApplicationToTest(HungrymoosedemoApplication.class)
+@SpecsFromResourcePath("api/hungrymoose/spec.yaml")
+public class HungryMooseRunnerAcceptanceTest {
+
+    @BeforeAll
+    static void beforeClass() {
+        System.setProperty("target.port", "10897");
+        HungryMooseTestRunner.from(HungryMooseRunnerAcceptanceTest.class).runApplication();
+    }
+
+    @ParameterizedTest
+    @MethodSource("getTestCases")
+    public void runHungryMooseTests(TestCase testCase) throws Exception {
+        testCase.runTest();
+    }
+
+    static Stream<TestCase> getTestCases() {
+        System.setProperty("target.port", "10897");
+        HungryMooseTestRunner testRunner = HungryMooseTestRunner.from(HungryMooseRunnerAcceptanceTest.class);
+        return testRunner.getTestCases().stream();
+    }
 }
 ```
 
@@ -31,7 +59,7 @@ needed to generate and run the tests are available in the annotations. The defin
 
 | Annotation | Description | Optional | Default Value |
 | ---------- | ----------- | -------- | ------------- |
-| `@RunWith` | [@RunWith](https://github.com/junit-team/junit4/wiki/Test-runners#runwith-annotation) property from JUnit 4. Specifies the custom HungryMoose runner that will be used for the tests. | No |
+| `@RunWith` | [@RunWith](https://github.com/junit-team/junit4/wiki/Test-runners#runwith-annotation) property from JUnit 4. Specifies the custom HungryMoose runner that will be used for the tests. | Yes |
 | `@ApplicationToTest` | Takes a class. Used to specify the Spring Boot application that the REST calls will be made against when running the tests. | No |
 | `@SpecsFromResourcePath` | Specifies the location of the HungryMoose YAML file used to generate the test cases. Should be a location accessible from the classpath. | No |
 | `@ThreadCount` | Takes an integer. Specifies the number of threads to create when running the HungryMoose tests. | Yes | 1 |

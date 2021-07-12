@@ -17,8 +17,7 @@
 
 package com.fordlabs.hungrymoose.testing;
 
-import com.fordlabs.hungrymoose.model.Request;
-import com.fordlabs.hungrymoose.model.Response;
+import com.fordlabs.hungrymoose.model.Scenario;
 import com.fordlabs.hungrymoose.validator.ContentTypeValidator;
 import com.fordlabs.hungrymoose.validator.body.BodyValidator;
 import com.fordlabs.hungrymoose.validator.body.json.JsonResponseValidator;
@@ -35,29 +34,29 @@ import static com.fordlabs.hungrymoose.requestbuilder.RequestClient.getResponse;
 import static com.google.common.net.MediaType.JSON_UTF_8;
 import static org.hamcrest.Matchers.is;
 
-class TestCase {
+public class TestCase {
 
-    private final Request request;
-    private final Response expectedResponse;
+    private final Scenario scenario;
+    private final UriUnderTest serverUnderTest;
     private final BodyValidator jsonResponseValidator = new JsonResponseValidator();
     private final BodyValidator defaultBodyValidator = new StringBodyValidator();
     private final Class<?> testClass;
 
-    public TestCase(final Request request, final Response expectedResponse, final Class<?> testClass) {
-        this.request = request;
-        this.expectedResponse = expectedResponse;
+    public TestCase(final Scenario scenario, UriUnderTest serverUnderTest, final Class<?> testClass) {
+        this.scenario = scenario;
+        this.serverUnderTest = serverUnderTest;
         this.testClass = testClass;
     }
 
-    public void runTest(final UriUnderTest serverUnderTest) throws Exception {
-        verifyResponse(getResponse(serverUnderTest, this.request));
+    public void runTest() throws Exception {
+        verifyResponse(getResponse(this.serverUnderTest, this.scenario.getRequest()));
     }
 
     protected void verifyResponse(final HttpResponse response) throws IOException {
-        String contentType = ContentTypeValidator.validate(this.expectedResponse, response);
+        String contentType = ContentTypeValidator.validate(this.scenario.getResponse(), response);
 
         final String responseBody = getResponseBody(response);
-        assertStatusLine(responseBody, response.getStatusLine().getStatusCode(), is(this.expectedResponse.getStatusCode().value()));
+        assertStatusLine(responseBody, response.getStatusLine().getStatusCode(), is(this.scenario.getResponse().getStatusCode().value()));
 
         assertResponseBody(responseBody, contentType);
     }
@@ -84,8 +83,8 @@ class TestCase {
     }
 
     void assertResponseBody(final String actualResponseBody, final String actualResponseContentType) {
-        if (this.expectedResponse.getBody().isEmpty()) return;
-        final String expectedResponseBody = this.expectedResponse.getBody();
+        if (this.scenario.getResponse().getBody().isEmpty()) return;
+        final String expectedResponseBody = this.scenario.getResponse().getBody();
         getBodyValidator(actualResponseContentType).validateBody(actualResponseBody, expectedResponseBody, this.testClass);
     }
 
@@ -95,5 +94,14 @@ class TestCase {
         } else {
             return this.defaultBodyValidator;
         }
+    }
+
+    public String getTestName() {
+        return this.scenario.getName();
+    }
+
+    @Override
+    public String toString() {
+        return getTestName();
     }
 }

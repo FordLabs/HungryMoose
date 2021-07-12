@@ -32,14 +32,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 
-public class HungryMooseTestRunnerTest {
+public class HungryMooseJUnit4TestRunnerTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void firesTestFailureWhenAnAssertionFails() {
-        HungryMooseTestRunner runner = new HungryMooseTestRunner(ThisTestShouldFailOrWeHaveBiggerProblems.class);
+        HungryMooseJUnit4TestRunner runner = new HungryMooseJUnit4TestRunner(ThisTestShouldFailOrWeHaveBiggerProblems.class);
         Result result = runJUnit(runner);
         assertThat(result.getFailureCount(), is(1));
     }
@@ -48,19 +48,19 @@ public class HungryMooseTestRunnerTest {
     public void throwsExceptionIfNoApplicationToTest() {
         this.expectedException.expect(IllegalArgumentException.class);
         this.expectedException.expectMessage("No testable class found. Are you missing the @ApplicationToTest annotation?");
-        new HungryMooseTestRunner(RunnerWithoutApplicationToTest.class);
+        new HungryMooseJUnit4TestRunner(RunnerWithoutApplicationToTest.class);
     }
 
     @Test
     public void throwsExceptionIfNoSpecFilePath() {
         this.expectedException.expect(IllegalArgumentException.class);
         this.expectedException.expectMessage("No spec file found. Are you missing the @SpecsFromResourcePath annotation?");
-        new HungryMooseTestRunner(RunnerWithoutSpecFilePath.class);
+        new HungryMooseJUnit4TestRunner(RunnerWithoutSpecFilePath.class);
     }
     
     @Test
     public void runsAnnotatedMethods() {
-        HungryMooseTestRunner runner = new HungryMooseTestRunner(AnnotatedTest.class);
+        HungryMooseJUnit4TestRunner runner = new HungryMooseJUnit4TestRunner(AnnotatedTest.class);
         runJUnit(runner);
         assertThat(AnnotatedTest.beforeClassCalled, is(true));
         assertThat(AnnotatedTest.afterClassCalled, is(true));
@@ -68,14 +68,14 @@ public class HungryMooseTestRunnerTest {
     
     @Test
     public void runsFailingBeforeAnnotatedMethods() {
-        HungryMooseTestRunner runner = new HungryMooseTestRunner(FailingBeforeAnnotatedTest.class);
+        HungryMooseJUnit4TestRunner runner = new HungryMooseJUnit4TestRunner(FailingBeforeAnnotatedTest.class);
         this.expectedException.expect(StoppedByUserException.class);
         runJUnit(runner);
     }
     
     @Test
     public void runsFailingAfterAnnotatedMethods() {
-        HungryMooseTestRunner runner = new HungryMooseTestRunner(FailingAfterAnnotatedTest.class);
+        HungryMooseJUnit4TestRunner runner = new HungryMooseJUnit4TestRunner(FailingAfterAnnotatedTest.class);
         Result result = runJUnit(runner);
         assertThat(result.getFailureCount(), is(1));
     }
@@ -134,7 +134,7 @@ public class HungryMooseTestRunnerTest {
     static class RunnerWithoutSpecFilePath {
     }
 
-    private Result runJUnit(HungryMooseTestRunner runner) {
+    private Result runJUnit(HungryMooseJUnit4TestRunner runner) {
         return new JUnitCore().run(Request.runner(runner));
     }
     

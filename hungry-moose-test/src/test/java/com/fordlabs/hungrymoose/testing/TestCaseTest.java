@@ -18,6 +18,7 @@
 package com.fordlabs.hungrymoose.testing;
 
 import com.fordlabs.hungrymoose.model.Response;
+import com.fordlabs.hungrymoose.model.Scenario;
 import com.fordlabs.hungrymoose.validator.body.json.JsonResponseValidator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -31,9 +32,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 public class TestCaseTest {
@@ -59,7 +60,7 @@ public class TestCaseTest {
     @Test
     public void assertBodyDelegatesToJsonValidatorForValidations() {
         Response expectedResponse = buildResponse("Content-Type: application/json", EXPECTED_BODY);
-        TestCase testCase = new TestCase(null, expectedResponse, HungryMooseTestRunner.class);
+        TestCase testCase = new TestCase(new Scenario(null, null, expectedResponse), null, HungryMooseJUnit4TestRunner.class);
 
         expectedException.expect(AssertionError.class);
         expectedException.expectMessage("Unparsable JSON string: expectedBody");
@@ -72,7 +73,7 @@ public class TestCaseTest {
         String expectedBody = "";
 
         Response expectedResponse = Response.from("200 OK\n" + "Content-Type: application/json" + "\n\n" + expectedBody);
-        TestCase testCase = new TestCase(null, expectedResponse, null);
+        TestCase testCase = new TestCase(new Scenario(null, null, expectedResponse), null, null);
 
         testCase.assertResponseBody(ACTUAL_BODY, JSON);
 
@@ -82,7 +83,7 @@ public class TestCaseTest {
     @Test
     public void checksForAGenericBodyByStringComparison() {
         Response expectedResponse = buildResponse("Content-Type: " + MediaType.valueOf("something/fake"), EXPECTED_BODY);
-        TestCase testCase = new TestCase(null, expectedResponse, null);
+        TestCase testCase = new TestCase(new Scenario(null, null, expectedResponse), null, null);
 
         testCase.assertResponseBody(EXPECTED_BODY, STRING_COMPARE);
     }
@@ -90,7 +91,7 @@ public class TestCaseTest {
     @Test(expected = AssertionError.class)
     public void failsWhenGenericBodyFailsStringComparison() {
         Response expectedResponse = buildResponse("Content-Type: application/json", EXPECTED_BODY);
-        TestCase testCase = new TestCase(null, expectedResponse, null);
+        TestCase testCase = new TestCase(new Scenario(null, null, expectedResponse), null, null);
 
         testCase.assertResponseBody("Something else", STRING_COMPARE);
     }
@@ -98,7 +99,7 @@ public class TestCaseTest {
     @Test(expected = AssertionError.class)
     public void assertStatusCodeWhenNoBody() throws Exception {
         Response expectedResponse = buildResponse("Content-Type: application/json", EXPECTED_BODY);
-        TestCase testCase = new TestCase(null, expectedResponse, null);
+        TestCase testCase = new TestCase(new Scenario(null, null, expectedResponse), null, null);
 
         HttpResponse httpResponse = makeResponseEntityWithNullContentType();
         when(httpResponse.getStatusLine()).thenReturn(makeStatusLineWith500Code());
@@ -108,7 +109,7 @@ public class TestCaseTest {
     @Test
     public void throwsMissingContentTypeErrorWhenExpectedBodyIsNotEmptyAndExpectedResponseHasNoContentType() throws Exception {
         Response expectedResponse = buildResponse("", EXPECTED_BODY);
-        TestCase testCase = new TestCase(null, expectedResponse, null);
+        TestCase testCase = new TestCase(new Scenario(null, null, expectedResponse), null, null);
 
         this.expectedException.expect(AssertionError.class);
         this.expectedException.expectMessage("Content-Type missing from expected response. Content-Type is required.");
@@ -120,9 +121,21 @@ public class TestCaseTest {
     @Test
     public void doesNotThrowMissingContentTypeErrorWhenExpectedBodyIsEmptyAndExpectedResponseHasNoContentType() throws Exception {
         Response expectedResponse = buildResponse("", "");
-        TestCase testCase = new TestCase(null, expectedResponse, null);
+        TestCase testCase = new TestCase(new Scenario(null, null, expectedResponse), null, null);
 
         testCase.verifyResponse(this.response);
+    }
+
+    @Test
+    public void getName_WithScenarioWithName_ReturnsScenarioName() {
+        TestCase testCase = new TestCase(new Scenario("Test Name", null, null), null, null);
+        assertThat(testCase.getTestName()).isEqualTo("Test Name");
+    }
+
+    @Test
+    public void toString_ReturnsScenarioName() {
+        TestCase testCase = new TestCase(new Scenario("Test Name", null, null), null, null);
+        assertThat(testCase.toString()).isEqualTo("Test Name");
     }
 
     private HttpResponse makeResponseEntityWithNullContentType() {
